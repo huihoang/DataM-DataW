@@ -67,5 +67,6 @@ coverage.xml
 .project
 .pydevproject
 
+.vendor/
 docs/
 
