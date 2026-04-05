@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data files
+data/*.csv
+data/*.xlsx
+data/*.parquet
+
+# Large artifacts (model files, outputs)
+artifacts/**/*.pkl
+artifacts/**/*.joblib
+artifacts/**/*.h5
+artifacts/**/*.pt
+artifacts/**/*.pth
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.fdb_latexmk
+*.fls
+*.out
+*.toc
+*.dvi
+*.pdf
+
+# Cache and temporary files
+*.cache
+.pytest_cache/
+coverage.xml
+.coverage
+
+# Misc
+*.DS_Store
+.project
+.pydevproject
+
+docs/
+
