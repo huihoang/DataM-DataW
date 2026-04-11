@@ -45,6 +45,7 @@ artifacts/**/*.joblib
 artifacts/**/*.h5
 artifacts/**/*.pt
 artifacts/**/*.pth
+artifacts/**/*.csv
 
 # LaTeX auxiliary files
 *.aux
