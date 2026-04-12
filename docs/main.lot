@@ -1,0 +1,16 @@
+\babel@toc {english}{}\relax 
+\babel@toc {english}{}\relax 
+\contentsline {table}{\numberline {1}{\ignorespaces Summary of original data after chronological split}}{17}{table.caption.10}%
+\contentsline {table}{\numberline {2}{\ignorespaces Class distribution details (Fraud vs Non-fraud)}}{17}{table.caption.11}%
+\contentsline {table}{\numberline {3}{\ignorespaces Duplicate Rows Check}}{17}{table.caption.12}%
+\contentsline {table}{\numberline {4}{\ignorespaces Missing Values Check}}{18}{table.caption.13}%
+\contentsline {table}{\numberline {5}{\ignorespaces Cardinality Analysis (Number of unique values)}}{18}{table.caption.14}%
+\contentsline {table}{\numberline {6}{\ignorespaces Amount (AMT) statistics by label}}{21}{table.caption.19}%
+\contentsline {table}{\numberline {7}{\ignorespaces List of Advanced Behavioral Features}}{22}{table.caption.20}%
+\contentsline {table}{\numberline {8}{\ignorespaces Top 15 Features After Consolidated Ranking}}{24}{table.caption.22}%
+\contentsline {table}{\numberline {9}{\ignorespaces List of Removed Columns and Reasons}}{25}{table.caption.23}%
+\contentsline {table}{\numberline {10}{\ignorespaces Summary of Final Data for Modeling}}{26}{table.caption.24}%
+\contentsline {table}{\numberline {11}{\ignorespaces Final 20 Features for Modeling}}{27}{table.caption.26}%
+\contentsline {table}{\numberline {12}{\ignorespaces Model performance with threshold = 0.7}}{30}{table.caption.27}%
+\contentsline {table}{\numberline {13}{\ignorespaces Model performance with threshold = 0.5}}{30}{table.caption.28}%
+\contentsline {table}{\numberline {14}{\ignorespaces Model performance with threshold = 0.2}}{31}{table.caption.29}%
