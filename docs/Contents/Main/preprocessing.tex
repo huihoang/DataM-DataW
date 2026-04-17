@@ -258,14 +258,14 @@ These observations confirm that temporal features are powerful fraud predictors.
 \centering
 \begin{minipage}{0.48\textwidth}
 \centering
-\includegraphics[width=\textwidth]{../Images/fraud_rate_by_hour.png}
+\includegraphics[width=\textwidth]{Images/fraud_rate_by_hour.png}
 \caption{Fraud rate by hour of day}
 \label{fig:fraud_hour}
 \end{minipage}
 \hfill
 \begin{minipage}{0.48\textwidth}
 \centering
-\includegraphics[width=\textwidth]{../Images/fraud_rate_by_dayofweek.png}
+\includegraphics[width=\textwidth]{Images/fraud_rate_by_dayofweek.png}
 \caption{Fraud rate by day of week}
 \label{fig:fraud_day}
 \end{minipage}
@@ -282,14 +282,14 @@ Transactions occurring at very far distances or impossibly far (e.g., 2 transact
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{../Images/distance_boxplot.png}
+\includegraphics[width=0.6\textwidth]{Images/distance_boxplot.png}
 \caption{Distance distribution by label (unit: km, cut at 99th percentile)}
 \label{fig:distance_dist}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{../Images/top_states_fraud_rate.png}
+\includegraphics[width=0.6\textwidth]{Images/top_states_fraud_rate.png}
 \caption{Top 10 states by fraud rate}
 \label{fig:top_states}
 \end{figure}
@@ -308,7 +308,7 @@ The transaction amount provides signal about fraud likelihood. Fraudsters often 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{../Images/amount_log_distribution.png}
+\includegraphics[width=0.6\textwidth]{Images/amount_log_distribution.png}
 \caption{Amount distribution (log-transformed) by label}
 \label{fig:amt_log}
 \end{figure}
@@ -471,7 +471,7 @@ After standardization, all 20 features have:
 \begin{itemize}
     \item Mean ($\mu$) = 0
     \item Standard Deviation ($\sigma$) = 1
-    \item Typical range $\approx [$-3, +3$]$ (under normal distribution assumption)
+    \item Typical range $\approx [-3, +3]$ (under normal distribution assumption)
 \end{itemize}
 
 \textbf{Benefits}:
@@ -517,7 +517,7 @@ This approach is more robust than a single method---it ensures we capture differ
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.75\textwidth]{../Images/feature_ranking_comparison.png}
+\includegraphics[width=0.75\textwidth]{Images/feature_ranking_comparison.png}
 \caption{Comparison of Feature Ranking Scores across 3 methods}
 \label{fig:ranking_comparison}
 \end{figure}
@@ -664,7 +664,7 @@ Result: balanced training set helps models learn patterns of both classes. Howev
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{../Images/smote.png}
+\includegraphics[width=0.9\textwidth]{Images/smote.png}
 \caption{Results of using SMOTE to handle class imbalance}
 
 \end{figure}
@@ -837,13 +837,13 @@ The complete schema of the final dataset ready for modeling:
 
 Before passing to the modeling phase, we verify:
 \begin{itemize}
-    \item \✓ No NaN (missing) values in any feature column
-    \item \✓ No infinite ($\pm \infty$) values in data
-    \item \✓ All feature values in expected normalized range [$-3, +3$]
-    \item \✓ No duplicate rows in any partition
-    \item \✓ Target labels contain only 0 and 1 (no other values)
-    \item \✓ No temporal leakage (train $<$ validation $<$ test chronologically)
-    \item \✓ Feature statistics computed from train only
+    \item $\checkmark$ No NaN (missing) values in any feature column
+    \item $\checkmark$ No infinite ($\pm \infty$) values in data
+    \item $\checkmark$ All feature values in expected normalized range $\approx [-3, +3]$
+    \item $\checkmark$ No duplicate rows in any partition
+    \item $\checkmark$ Target labels contain only 0 and 1 (no other values)
+    \item $\checkmark$ No temporal leakage (train $<$ validation $<$ test chronologically)
+    \item $\checkmark$ Feature statistics computed from train only
 \end{itemize}
 
 \subsubsection{Final Dataset Partitioning Summary}
