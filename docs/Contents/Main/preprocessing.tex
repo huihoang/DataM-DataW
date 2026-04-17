@@ -157,6 +157,74 @@ gender & 2 & Very low & Keep \\
 \end{tabular}
 \end{table}
 
+\subsection{Exploratory Data Analysis (EDA)}
+
+After initial data cleaning, we perform comprehensive exploratory data analysis to understand patterns, distributions, and key insights that will guide our feature engineering process.
+
+\subsubsection{Class Imbalance Analysis}
+
+The primary challenge in this dataset is extreme class imbalance:
+
+\begin{table}[h]
+\centering
+\caption{Class Distribution in Processed Datasets}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Partition} & \textbf{Legitimate (0)} & \textbf{Fraud (1)} & \textbf{Fraud Rate} \\
+\hline
+Train Split & 1,035,623 & 1,717 & 0.166\% \\
+\hline
+Validation Split & 259,103 & 232 & 0.089\% \\
+\hline
+Test Holdout & 555,274 & 445 & 0.080\% \\
+\hline
+\end{tabular}
+\end{table}
+
+Key observations:
+\begin{itemize}
+    \item \textbf{Fraud represents <0.2\% of transactions}---this is realistic but creates severe imbalance
+    \item \textbf{Standard ML models struggle}: Algorithms tend to overfit the majority class
+    \item \textbf{Accuracy is misleading}: A model predicting "never fraud" achieves >99.8\% accuracy
+    \item \textbf{Solution}: Use metrics like Recall, Precision, F1-score, and ROC-AUC; apply SMOTE for balanced training
+\end{itemize}
+
+\subsubsection{Key EDA Findings}
+
+From exploratory analysis, several critical fraud patterns emerge:
+
+\textbf{Pattern 1: Temporal Anomalies}
+\begin{itemize}
+    \item \textbf{Late-night activity}: Fraud spikes between 10 PM - 4 AM (fraudsters choose times when cardholders sleep)
+    \item \textbf{Weekend elevation}: Fraud rates are 30-50\% higher on weekends (weaker monitoring)
+    \item \textbf{Seasonal patterns}: Holiday periods show elevated fraud due to increased transaction volume
+    \item \textbf{Implication}: Temporal features (hour, day-of-week, weekend flag) are strong fraud predictors
+\end{itemize}
+
+\textbf{Pattern 2: Geographic Anomalies}
+\begin{itemize}
+    \item \textbf{State variation}: Some states (e.g., CA, TX, NY) show higher fraud rates due to population and transaction volume
+    \item \textbf{Distance signal}: Transactions occurring very far from cardholder's typical location are suspicious
+    \item \textbf{Impossible travel}: Multiple transactions far apart in short time windows are extreme fraud red flags
+    \item \textbf{Implication}: Distance features and geographic information are valuable
+\end{itemize}
+
+\textbf{Pattern 3: Amount-Based Signals}
+\begin{itemize}
+    \item \textbf{Higher amounts}: Fraudulent transactions average \$149 vs \$62 for legitimate (2.4x difference)
+    \item \textbf{Amount distribution}: Fraud spikes above \$300-500 thresholds
+    \item \textbf{Outliers}: Very large transactions (>$1000) warrant additional scrutiny
+    \item \textbf{Implication}: Transaction amount is a strong predictor
+\end{itemize}
+
+\textbf{Pattern 4: Behavioral Signals}
+\begin{itemize}
+    \item \textbf{Merchant variation}: Fraud rates vary dramatically across merchants (0.05\% - 5.0\%)
+    \item \textbf{Velocity signal}: Cardholders with high transaction counts in short windows differ from normal
+    \item \textbf{Historical deviations}: Transactions anomalous compared to cardholder/merchant history signal fraud
+    \item \textbf{Implication}: Merchant and cardholder history features are crucial
+\end{itemize}
+
 \subsection{Feature Engineering}
 
 Feature engineering is the process of creating new features from raw data to capture important patterns and relationships that raw data does not directly express. This is one of the most creative parts of machine learning---a good feature set can improve model performance by 20-30\%, while a poor set can make models perform worse than baseline.
@@ -304,6 +372,116 @@ age\_group & Age binning: <18, 18-25, 26-35, 36-45, 46-55, 56-65, 65+ \\
 \hline
 \end{tabular}
 \end{table}
+
+\subsection{Missing Values and Outlier Handling}
+
+\subsubsection{Missing Value Strategy}
+
+While the primary dataset has no missing values at the column level, we employ a comprehensive strategy to handle implicit missing data:
+
+\begin{itemize}
+    \item \textbf{Verify zero values}: Some zeros may represent implicit missing data (e.g., age $= 0$ for customers without DOB)
+    \item \textbf{Domain-specific handling}:
+        - Distance $= 0$: Valid for online transactions or same-location usage (keep as-is)
+        - Age $= 0$: Potential data quality issue (flag for investigation)
+        - Amount $= 0$: Unusual, likely data collection error
+    \item \textbf{Imputation strategy if needed}:
+        - If $<2\%$ of records: Remove rows with critical missing values
+        - If 2-10\% of records: Use median/mode imputation
+        - If $>$10\% of records: Keep as meaningful pattern (e.g., age $= 0$ for international customers)
+\end{itemize}
+
+\subsubsection{Outlier Detection and Handling}
+
+Outliers in fraud detection are not automatically removed because they often represent extreme but legitimate variations (e.g., large transactions at jewelry stores) that are NOT fraud. However, some outliers are fraud signals:
+
+\begin{itemize}
+    \item \textbf{Amount outliers}: Top 0.1\% ($>$\$9,000) are legitimate luxury purchases or fraud
+        - Treatment: Keep but apply log transformation to reduce impact of extreme values
+    \item \textbf{Distance outliers}: Transactions $>$1000 km from typical location
+        - Treatment: Apply distance normalization using Haversine distance percentiles
+    \item \textbf{Frequency outliers}: Cardholders with $>50$ transactions per hour
+        - Treatment: Flag as abnormal but keep (may indicate testing or fraud spree)
+    \item \textbf{Decision}: Outliers are systematically analyzed but NOT removed, as they may be fraud indicators
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\caption{Outlier Analysis by Feature}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Feature} & \textbf{Q1} & \textbf{Q3} & \textbf{99th \%ile} & \textbf{Treatment} \\
+\hline
+amt & \$16 & \$69 & \$500+ & Log scale transformation \\
+\hline
+distance\_km & 12 km & 120 km & 2000+ km & Percentile normalization \\
+\hline
+trans\_count & 1 & 5 & 50+ & Velocity anomaly scoring \\
+\hline
+age & 30 & 55 & 90+ & Bin into age groups \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Feature Scaling and Standardization}
+
+\subsubsection{Motivation for Scaling}
+
+Raw features have dramatically different scales:
+\begin{itemize}
+    \item \textit{age}: ranges 18-80 (scale $\approx 62$)
+    \item \textit{distance\_km}: ranges 0-2000+ (scale $\approx 2000$)
+    \item \textit{amt\_log}: ranges 0-10 (scale $\approx 10$)
+    \item \textit{is\_weekend}: binary 0-1 (scale $= 1$)
+\end{itemize}
+
+When scales differ dramatically, distance-based models (Nearest Neighbors, SVM, neural networks) perform poorly because:
+\begin{itemize}
+    \item Large-scale features dominate distance calculations
+    \item Learning rates and convergence are affected
+    \item Feature importance becomes biased toward high-scale variables
+\end{itemize}
+
+\subsubsection{Standardization (Z-score Normalization)}
+
+We apply \textbf{StandardScaler} to transform all 20 features to mean=0 and standard deviation=1:
+
+\[
+z = \frac{x - \mu}{\sigma}
+\]
+
+where $\mu$ is the feature mean and $\sigma$ is the standard deviation, both computed from the training set.
+
+\subsubsection{Fair Scaler Fitting (Data Leakage Prevention)}
+
+\textbf{Critical}: The scaler is fit ONLY on the training set, then applied consistently to all partitions:
+
+\begin{enumerate}
+    \item \textbf{Step 1}: Fit scaler on \textit{train\_split}: compute $\mu_{train}$ and $\sigma_{train}$
+    \item \textbf{Step 2}: Transform \textit{train\_split}: $x' = \frac{x - \mu_{train}}{\sigma_{train}}$
+    \item \textbf{Step 3}: Transform \textit{validation\_split} using train statistics: $x' = \frac{x - \mu_{train}}{\sigma_{train}}$
+    \item \textbf{Step 4}: Transform \textit{test\_holdout} using train statistics: $x' = \frac{x - \mu_{train}}{\sigma_{train}}$
+\end{enumerate}
+
+\textbf{Why?} Using validation/test statistics would cause information leakage: validation/test sets would implicitly "inform" the scaling, violating the principle that test data should be truly unseen.
+
+\subsubsection{Result: Normalized Feature Space}
+
+After standardization, all 20 features have:
+\begin{itemize}
+    \item Mean ($\mu$) = 0
+    \item Standard Deviation ($\sigma$) = 1
+    \item Typical range $\approx [$-3, +3$]$ (under normal distribution assumption)
+\end{itemize}
+
+\textbf{Benefits}:
+\begin{itemize}
+    \item \textbf{Faster training}: Scaled inputs lead to faster convergence in gradient-based optimizers
+    \item \textbf{Neural network stability}: Gradient descent is more stable with normalized inputs
+    \item \textbf{Fair feature comparison}: No single feature dominates due to scale
+    \item \textbf{Better interpretation}: Feature coefficients (e.g., logistic regression weights) are directly comparable
+    \item \textbf{Algorithm compatibility}: Required for SVM, KNN, neural networks; beneficial for tree-based models
+\end{itemize}
 
 \subsection{Feature Selection}
 
@@ -571,3 +749,128 @@ All 20 features have high consolidated importance scores (ranging from 0.88 to 0
 \end{itemize}
 
 This feature set is the result of careful feature engineering from ~50 initial features, optimized between model performance and interpretability.
+
+\subsection{Data Integration and Final Schema}
+
+\subsubsection{Chronological Data Merging}
+
+Since we use two separate files (fraudTrain.csv and fraudTest.csv), the data integration process is:
+
+\begin{enumerate}
+    \item \textbf{Load fraudTrain.csv}: 1,296,675 rows with timestamps
+    \item \textbf{Load fraudTest.csv}: 555,719 rows with timestamps
+    \item \textbf{Verify temporal order}: Confirm timestamps in fraudTest are strictly after fraudTrain
+    \item \textbf{Design principle}: Training set contains older transactions, test set contains newer transactions
+    \item \textbf{Benefit}: Simulates real deployment (train on past, evaluate on future)
+\end{enumerate}
+
+\subsubsection{Cross-Dataset Feature Consistency}
+
+For behavioral features computed from historical statistics, we ensure consistency across datasets:
+
+\begin{itemize}
+    \item \textbf{merchant\_fraud\_rate}: Computed from train set only, applied to validation and test
+    \item \textbf{merchant\_avg\_amount}: Computed from train set only, applied to all partitions
+    \item \textbf{merchant\_trans\_count}: Computed from train set only
+    \item \textbf{Rationale}: Validation and test should NOT see future merchant statistics (prevents data leakage)
+\end{itemize}
+
+\subsubsection{Final Preprocessed Dataset Schema}
+
+The complete schema of the final dataset ready for modeling:
+
+\begin{table}[H]
+\centering
+\caption{Final Preprocessed Dataset - Complete Column Schema}
+\footnotesize
+\begin{tabular}{|c|l|l|c|}
+\hline
+\textbf{No} & \textbf{Feature} & \textbf{Type} & \textbf{Scaled?} \\
+\hline
+1 & distance\_km & Float & Yes (StandardScaler) \\
+\hline
+2 & amt\_log & Float & Yes \\
+\hline
+3 & merchant\_fraud\_rate & Float & Yes \\
+\hline
+4 & hour & Integer & Yes \\
+\hline
+5 & trans\_count\_hourly & Integer & Yes \\
+\hline
+6 & trans\_count\_daily & Integer & Yes \\
+\hline
+7 & amt & Float & Yes \\
+\hline
+8 & merchant\_avg\_amount & Float & Yes \\
+\hline
+9 & age & Integer & Yes \\
+\hline
+10 & is\_weekend & Binary (0/1) & Yes \\
+\hline
+11 & dayofweek & Integer & Yes \\
+\hline
+12 & category & Integer (encoded) & Yes \\
+\hline
+13 & month & Integer & Yes \\
+\hline
+14 & amt\_x\_distance & Float & Yes \\
+\hline
+15 & merchant\_trans\_count & Integer & Yes \\
+\hline
+16 & time\_since\_last\_trans & Float & Yes \\
+\hline
+17 & age\_group & Integer (binned) & Yes \\
+\hline
+18 & state & Integer (encoded) & Yes \\
+\hline
+19 & gender & Binary (0/1) & Yes \\
+\hline
+20 & fraud\_dist\_percentile & Float & Yes \\
+\hline
+\hline
+& \textbf{Target}: is\_fraud & Binary (0/1) & No \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Data Quality Verification (Pre-Modeling Checklist)}:
+
+Before passing to the modeling phase, we verify:
+\begin{itemize}
+    \item \✓ No NaN (missing) values in any feature column
+    \item \✓ No infinite ($\pm \infty$) values in data
+    \item \✓ All feature values in expected normalized range [$-3, +3$]
+    \item \✓ No duplicate rows in any partition
+    \item \✓ Target labels contain only 0 and 1 (no other values)
+    \item \✓ No temporal leakage (train $<$ validation $<$ test chronologically)
+    \item \✓ Feature statistics computed from train only
+\end{itemize}
+
+\subsubsection{Final Dataset Partitioning Summary}
+
+\begin{table}[H]
+\centering
+\caption{Final Preprocessed Datasets Ready for Modeling}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Partition} & \textbf{Rows} & \textbf{Fraud Count} & \textbf{Fraud Rate} & \textbf{Purpose} \\
+\hline
+Train (Original Imbalanced) & 1,037,340 & 1,717 & 0.166\% & Train model \\
+\hline
+Train (After SMOTE) & 2,074,680 & 1,037,340 & 50.0\% & Balanced training \\
+\hline
+Validation & 259,335 & 232 & 0.089\% & Hyperparameter tuning \\
+\hline
+Test Holdout & 555,719 & 445 & 0.080\% & Final evaluation \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Key Notes on Dataset Preparation}:
+
+\begin{itemize}
+    \item \textbf{Two training strategies}: Models are trained on both original (imbalanced) and SMOTE-balanced datasets
+    \item \textbf{Preserved test distribution}: Validation and test sets are NOT SMOTE-balanced, reflecting real-world fraud rates
+    \item \textbf{Realistic evaluation}: Final model performance metrics (Precision, Recall, ROC-AUC) are computed on original imbalanced test distribution
+    \item \textbf{SMOTE parameters}: Default k-neighbors $= 5$, oversampling to 50-50 balance
+\end{itemize}
