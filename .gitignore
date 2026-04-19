@@ -40,11 +40,7 @@ data/*.xlsx
 data/*.parquet
 
 # Large artifacts (model files, outputs)
-artifacts/**/*.pkl
-artifacts/**/*.joblib
-artifacts/**/*.h5
-artifacts/**/*.pt
-artifacts/**/*.pth
+artifacts/
 
 # LaTeX auxiliary files
 *.aux
