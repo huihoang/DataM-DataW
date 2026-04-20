@@ -49,13 +49,16 @@ artifacts/processed_csv/*.csv
 
 # LaTeX auxiliary files
 *.aux
-*.log
-*.fdb_latexmk
-*.fls
-*.out
+*.lof
+*.lot
 *.toc
+*.out
+*.log
+*.fls
+*.fdb_latexmk
 *.dvi
-*.pdf
+*.synctex.gz
+# *.pdf
 
 # Cache and temporary files
 *.cache
@@ -69,5 +72,7 @@ coverage.xml
 .pydevproject
 
 .vendor/
-docs/
+
+local-images/
+
 

@@ -1,0 +1,53 @@
+\newpage
+\section{Introduction}
+\subsection{Problem}
+
+\textit{Background and Technological Trends}
+
+In recent years, the rapid growth of digital payment systems and online transactions has significantly increased the risk of fraudulent activities. With the widespread use of credit cards and e-commerce platforms, financial fraud has become a critical issue affecting both individuals and financial institutions.
+
+Traditional rule-based fraud detection systems are no longer sufficient due to the increasing complexity and volume of transactions. Therefore, data mining and machine learning techniques have become essential tools for detecting fraudulent behavior efficiently and accurately.
+
+\textit{Why Choose This Topic?}
+
+The idea behind this project is to apply data mining techniques to analyze transaction data and identify patterns that distinguish fraudulent transactions from legitimate ones
+
+
+This topic is chosen because:
+\begin{itemize}
+    \item Fraud detection is a real-world, high-impact problem in financial systems, where undetected fraud can lead to significant economic losses.
+    \item The dataset is large-scale and reflects realistic transaction behavior, making it suitable for practical analysis.
+    \item It provides an opportunity to apply a complete data mining pipeline, including exploratory data analysis (EDA), preprocessing, and machine learning modeling.
+    \item The problem involves severe class imbalance, which is a common and challenging issue in real-world applications.
+\end{itemize}
+
+
+
+\subsection{Goal}
+The main objectives of this project are:
+\begin{itemize} 
+    \item To explore and understand the structure and characteristics of the transaction dataset.
+    \item To identify patterns and key factors that distinguish fraudulent transactions from normal ones.
+    \item To address the class imbalance problem using appropriate techniques (e.g., resampling methods).
+    \item To build and compare multiple machine learning models for fraud detection.
+    \item To evaluate model performance using suitable metrics, with a focus on Recall and PR-AUC.
+    \item To analyze the impact of different decision thresholds on model performance.
+\end{itemize}
+
+
+
+\subsection{Scope}
+This project focuses on:
+\begin{itemize}
+    \item \textbf{Dataset:} \texttt{fraudTrain.csv}, containing transaction records for fraud detection.
+    
+    \item \textbf{Tasks:}
+    \begin{itemize} 
+        \item \textbf{Data Understanding:} Analyze data distribution, detect imbalance, and extract initial insights.
+        
+        \item \textbf{Data Preprocessing:} Perform data cleaning, scaling, dimensionality reduction, and imbalance handling (e.g., SMOTE).
+
+        \item \textbf{Modeling \& Evaluation:} Train and compare four models (Logistic Regression, Decision Tree, Gaussian Naive Bayes, and ANN/MLP) on both imbalanced and SMOTE-balanced datasets, evaluate under multiple thresholds (0.7, 0.5, 0.2), and assess performance using metrics such as Accuracy, Precision, Recall, F1-score, ROC-AUC, and PR-AUC.
+    \end{itemize}
+
+\end{itemize}
