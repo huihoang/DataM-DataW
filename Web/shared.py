@@ -49,9 +49,9 @@ def load_models():
 
 
 @st.cache_data
-def load_model_results():
+def load_model_results(threshold: str = "0.2"):
     try:
-        results_file = ARTIFACTS_PATH / "modeling_results" / "model_comparison_threshold_0.2.csv"
+        results_file = ARTIFACTS_PATH / "modeling_results" / f"model_comparison_threshold_{threshold}.csv"
         if results_file.exists():
             return pd.read_csv(results_file)
     except Exception:

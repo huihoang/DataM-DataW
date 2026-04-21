@@ -122,8 +122,8 @@ def render_prediction() -> None:
 
     feature_values["amt_log"] = np.log1p(feature_values["amt"])
     feature_values["amt_x_distance"] = feature_values["amt"] * feature_values["distance_km"]
-    st.markdown("---")
 
+    st.markdown("---")
     if st.button("🔍 Predict Fraud", width="stretch"):
         features_array = [feature_values[f] for f in FEATURE_NAMES]
         df = pd.DataFrame([features_array], columns=FEATURE_NAMES)
@@ -185,3 +185,17 @@ def render_prediction() -> None:
             with col3:
                 normal_prob = max(1 - prob, prob)
                 st.metric("Normal Probability", f"{normal_prob:.2%}")
+
+
+    st.markdown("---")
+    st.markdown(
+        """
+    <div class="section-card">
+        <h2>🎯 Pipline Transaction Prediction</h2>
+        <p>Query transaction in Database to get real-time fraud probability prediction</p>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    
