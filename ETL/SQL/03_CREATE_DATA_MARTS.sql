@@ -32,8 +32,9 @@ FROM fact_transactions f
 INNER JOIN dim_merchant m ON f.merchant_id = m.merchant_id
 GROUP BY m.merchant_id, m.merchant_name, m.merchant_category, m.merch_lat, m.merch_long;
 
-CREATE INDEX idx_dm_merchant_fraud_rate ON dm_merchant_fraud(fraud_rate_pct DESC);
-CREATE INDEX idx_dm_merchant_fraud_amount ON dm_merchant_fraud(fraud_amount DESC);
+CREATE INDEX idx_dm_merchant_fraud_rate ON dm_merchant_fraud (fraud_rate_pct DESC);
+
+CREATE INDEX idx_dm_merchant_fraud_amount ON dm_merchant_fraud (fraud_amount DESC);
 
 -- ============================================================================
 -- 2. DATA MART: LOCATION RISK PROFILE
@@ -64,8 +65,9 @@ FROM fact_transactions f
 INNER JOIN dim_location l ON f.location_id = l.location_id
 GROUP BY l.location_id, l.city, l.state, l.zip, l.lat, l.long, l.city_pop;
 
-CREATE INDEX idx_dm_location_fraud_rate ON dm_location_fraud(fraud_rate_pct DESC);
-CREATE INDEX idx_dm_location_fraud_state ON dm_location_fraud(state);
+CREATE INDEX idx_dm_location_fraud_rate ON dm_location_fraud (fraud_rate_pct DESC);
+
+CREATE INDEX idx_dm_location_fraud_state ON dm_location_fraud (state);
 
 -- ============================================================================
 -- 3. DATA MART: CUSTOMER RISK PROFILE
@@ -99,9 +101,11 @@ INNER JOIN dim_customer c ON f.customer_id = c.customer_id
 INNER JOIN dim_time t ON f.time_id = t.time_id
 GROUP BY c.customer_id, c.first_name, c.last_name, c.gender, c.state, c.job;
 
-CREATE INDEX idx_dm_customer_risk_fraud_rate ON dm_customer_risk(fraud_rate_pct DESC);
-CREATE INDEX idx_dm_customer_risk_fraud_amount ON dm_customer_risk(fraud_amount DESC);
-CREATE INDEX idx_dm_customer_risk_state ON dm_customer_risk(state);
+CREATE INDEX idx_dm_customer_risk_fraud_rate ON dm_customer_risk (fraud_rate_pct DESC);
+
+CREATE INDEX idx_dm_customer_risk_fraud_amount ON dm_customer_risk (fraud_amount DESC);
+
+CREATE INDEX idx_dm_customer_risk_state ON dm_customer_risk (state);
 
 -- ============================================================================
 -- 4. DATA MART: TEMPORAL FRAUD PATTERNS
@@ -136,9 +140,11 @@ INNER JOIN dim_time t ON f.time_id = t.time_id
 GROUP BY t.time_id, t.trans_date_trans_time, t.hour, t.day_of_week, t.day_of_week_name,
          t.month, t.month_name, t.year, t.is_weekend, t.quarter;
 
-CREATE INDEX idx_dm_time_fraud_hour ON dm_time_fraud(hour);
-CREATE INDEX idx_dm_time_fraud_day ON dm_time_fraud(day_of_week);
-CREATE INDEX idx_dm_time_fraud_rate ON dm_time_fraud(fraud_rate_pct DESC);
+CREATE INDEX idx_dm_time_fraud_hour ON dm_time_fraud (hour);
+
+CREATE INDEX idx_dm_time_fraud_day ON dm_time_fraud (day_of_week);
+
+CREATE INDEX idx_dm_time_fraud_rate ON dm_time_fraud (fraud_rate_pct DESC);
 
 -- ============================================================================
 -- 5. DATA MART: FRAUD SUMMARY DASHBOARD
@@ -171,7 +177,7 @@ FROM fact_transactions;
 
 -- Note: To refresh data marts with new data, run:
 -- DROP TABLE dm_merchant_fraud; CREATE TABLE dm_merchant_fraud AS ... (see above)
--- 
+--
 -- For production, consider using materialized views with REFRESH:
 -- CREATE MATERIALIZED VIEW dm_merchant_fraud AS ... (same query above)
 -- REFRESH MATERIALIZED VIEW dm_merchant_fraud;
