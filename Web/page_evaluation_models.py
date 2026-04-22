@@ -2,8 +2,68 @@ import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 from pathlib import Path
+import json
+import pandas as pd
+import re
 
 from shared import load_model_results
+
+
+@st.cache_data(show_spinner=False)
+def load_model_parameter_report() -> dict:
+    report_path = Path(__file__).resolve().parents[1] / "artifacts" / "modeling_results" / "parameter" / "model_comparison_artifact_report.json"
+    if not report_path.exists():
+        return {}
+    try:
+        with report_path.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def extract_model_repr_table(model_repr: str) -> pd.DataFrame:
+    rows: list[dict[str, str]] = []
+    explanations = {
+        "Pipeline": "Cho biết model có được đóng gói theo sklearn Pipeline hay không.",
+        "Preprocessor": "Khối tiền xử lý đặc trưng trước khi đưa vào mô hình.",
+        "Imputer strategy": "Cách xử lý giá trị thiếu trong dữ liệu đầu vào.",
+        "Scaler": "Phương pháp chuẩn hóa/scale đặc trưng số.",
+        "SVD n_components": "Số chiều giữ lại sau bước giảm chiều bằng TruncatedSVD.",
+        "SVD random_state": "Seed cố định để tái lập kết quả của bước SVD.",
+        "SVD": "Cho biết pipeline có dùng giảm chiều SVD hay không.",
+        "Classifier": "Thuật toán phân loại ở bước cuối của pipeline.",
+        "Classifier params": "Các siêu tham số chính của mô hình phân loại.",
+    }
+
+    def add_row(field: str, value: str) -> None:
+        rows.append({"Field": field, "Value": value, "Explanation": explanations.get(field, "")})
+
+    add_row("Pipeline", "Yes" if "Pipeline(" in model_repr else "No")
+    add_row("Preprocessor", "ColumnTransformer" if "ColumnTransformer" in model_repr else "N/A")
+
+    imputer_match = re.search(r"SimpleImputer\(strategy='([^']+)'\)", model_repr)
+    add_row("Imputer strategy", imputer_match.group(1) if imputer_match else "N/A")
+
+    scaler_match = re.search(r"(StandardScaler|MinMaxScaler|RobustScaler)\(\)", model_repr)
+    add_row("Scaler", scaler_match.group(1) if scaler_match else "N/A")
+
+    svd_match = re.search(r"TruncatedSVD\(n_components=(\d+),\s*random_state=(\d+)\)", model_repr)
+    if svd_match:
+        add_row("SVD n_components", svd_match.group(1))
+        add_row("SVD random_state", svd_match.group(2))
+    else:
+        add_row("SVD", "Not used")
+
+    clf_match = re.search(r"\('clf',\s*([A-Za-z_][A-Za-z0-9_]*)\((.*?)\)\)\]", model_repr, flags=re.DOTALL)
+    if clf_match:
+        clf_name = clf_match.group(1)
+        clf_params_raw = " ".join(clf_match.group(2).split())
+        add_row("Classifier", clf_name)
+        add_row("Classifier params", clf_params_raw if clf_params_raw else "(default)")
+    else:
+        add_row("Classifier", "N/A")
+
+    return pd.DataFrame(rows)
 
 
 def render_evaluation_models() -> None:
@@ -11,6 +71,7 @@ def render_evaluation_models() -> None:
         """
     <div class="section-card">
         <h2>📊 Evaluation Models</h2>
+        <p>Trang đánh giá số liệu của các mô hình với các ngưỡng khác nhau và các thống kê metrics.</p>
     </div>
     """,
         unsafe_allow_html=True,
@@ -29,7 +90,7 @@ def render_evaluation_models() -> None:
     with col3:
         train_var = st.selectbox("🎯 Training Strategy", ["All", "imbalanced", "balanced_smote"])
 
-    with st.expander("📋 Results & Filters", expanded=True):
+    with st.expander("📋 Detailed Metrics", expanded=True):
         df_plot = results_df.copy()
         if train_var != "All":
             df_plot = df_plot[df_plot["train_variant"] == train_var]
@@ -46,7 +107,7 @@ def render_evaluation_models() -> None:
             st.warning(f"⚠️ Column '{col_name}' not found in results")
             return
 
-        st.markdown("### Detailed Metrics")
+        st.markdown("### Metrics Table")
         if dataset_prefix is None:
             display_cols = ["model", "train_variant"] + [c for c in df_plot.columns if c.startswith(("valid_", "test_"))]
         else:
@@ -79,8 +140,51 @@ def render_evaluation_models() -> None:
             plt.tight_layout()
             st.pyplot(fig)
 
+    with st.expander("🧩 Detailed Parameters", expanded=False):
+        report = load_model_parameter_report()
+        pickles = report.get("pickles", []) if isinstance(report, dict) else []
+
+        if not pickles:
+            st.info("⚠️ Parameter report not found or empty.")
+        else:
+            rows = []
+            for item in pickles:
+                artifact_name = item.get("artifact_name", "")
+                if "__" in artifact_name:
+                    strategy, model_name_with_ext = artifact_name.split("__", 1)
+                    model_name = model_name_with_ext.replace(".pkl", "")
+                else:
+                    strategy = "unknown"
+                    model_name = artifact_name.replace(".pkl", "")
+
+                rows.append(
+                    {
+                        "artifact_name": artifact_name,
+                        "train_variant": strategy,
+                        "model": model_name,
+                        "final_estimator_type": item.get("final_estimator_type", "N/A"),
+                        "pipeline_steps": " -> ".join(item.get("pipeline_steps", [])),
+                    }
+                )
+
+            params_df = pd.DataFrame(rows)
+
+            if train_var != "All":
+                params_df = params_df[params_df["train_variant"] == train_var]
+
+            if params_df.empty:
+                st.info(f"ℹ️ No parameter rows for strategy `{train_var}`.")
+            else:
+                selected_artifact = st.selectbox("Select artifact", params_df["artifact_name"].tolist())
+                selected_item = next((x for x in pickles if x.get("artifact_name") == selected_artifact), None)
+
+                if selected_item:
+                    model_repr = str(selected_item.get("model_repr", ""))
+                    st.markdown("#### Model Representation (Structured Table)")
+                    st.dataframe(extract_model_repr_table(model_repr), width="stretch", hide_index=True)
+
     st.markdown("---")
-    st.markdown("### 🖼️ Model Comparison")
+    st.markdown("### 🖼️ Models Comparison")
 
     model_compare_dir = Path(__file__).resolve().parents[1] / "artifacts" / "modeling_results" / "figures" / "model_compare"
     if not model_compare_dir.exists():

@@ -1,0 +1,65 @@
+{
+  "base_dir": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results",
+  "artifacts_dir": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts",
+  "pipeline_groups": [
+    "pipeline_artifact"
+  ],
+  "num_pipeline_pickles_found": 1,
+  "pickles": [
+    {
+      "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\pipeline_artifact\\inference_pipeline.pkl",
+      "artifact_name": "inference_pipeline.pkl",
+      "load_status": "ok",
+      "object_type": "Pipeline",
+      "module": "sklearn.pipeline",
+      "model_repr": "Pipeline(steps=[('feature_engineering',\n                 <__main__.PreprocessingTransformer object at 0x000001DC35A6D580>),\n                ('feature_selector',\n                 <__main__.FeatureSelector object at 0x000001DC37474350>),\n                ('fill_missing',\n                 <__main__.NumericFillna object at 0x000001DC374E4DA0>),\n                ('model',\n                 Pipeline(steps=[('prep',\n                                  ColumnTransformer(transformers=[('num',\n                                                                   Pipeline(steps=[('imputer',\n                                                                                    SimpleI...\n                                                                    'merchant_fraud_rate',\n                                                                    'is_weekend',\n                                                                    'merchant_trans_count',\n                                                                    'age',\n                                                                    'trans_count_daily',\n                                                                    'dayofweek',\n                                                                    'time_since_last_transaction_min',\n                                                                    'month',\n                                                                    'city_pop',\n                                                                    'lat',\n                                                                    'long',\n                                                                    'distance_km',\n                                                                    'merch_long',\n                                                                    'merch_lat'])])),\n                                 ('svd',\n                                  TruncatedSVD(n_components=20,\n                                               random_state=42)),\n                                 ('clf',\n                                  MLPClassifier(early_stopping=True,\n                                                hidden_layer_sizes=(64, 32),\n                                                random_state=42))]))])",
+      "pipeline_steps": [
+        "feature_engineering",
+        "feature_selector",
+        "fill_missing",
+        "model"
+      ],
+      "final_estimator_type": "Pipeline",
+      "classes_": "[0 1]",
+      "params": {
+        "memory": null,
+        "steps": [
+          [
+            "feature_engineering",
+            "<__main__.PreprocessingTransformer object at 0x000001DC35A6D580>"
+          ],
+          [
+            "feature_selector",
+            "<__main__.FeatureSelector object at 0x000001DC37474350>"
+          ],
+          [
+            "fill_missing",
+            "<__main__.NumericFillna object at 0x000001DC374E4DA0>"
+          ],
+          [
+            "model",
+            "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('svd', TruncatedSVD(n_components=20, random_state=42)),\n                ('clf',\n                 MLPClassifier(early_stopping=True, hidden_layer_sizes=(64, 32),\n                               random_state=42))])"
+          ]
+        ],
+        "transform_input": null,
+        "verbose": false
+      },
+      "important_attributes": [
+        "steps",
+        "named_steps",
+        "predict",
+        "predict_proba",
+        "fit",
+        "get_params",
+        "classes_"
+      ],
+      "learned_attributes_sample": [
+        "_repr_html_",
+        "_repr_mimebundle_",
+        "_sk_visual_block_",
+        "classes_"
+      ]
+    }
+  ],
+  "data_source": "pkl_only"
+}
