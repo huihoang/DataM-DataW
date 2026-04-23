@@ -1,0 +1,378 @@
+\newpage
+
+\section{Data Warehouse Architecture}
+
+\subsection{Staging Layer}
+
+\textbf{Input:} fraudTrain.csv (1,296,675 rows) + fraudTest.csv (555,719 rows)
+
+\textbf{Operations:}
+\begin{itemize}
+    \item Load both CSV files into a single table
+    \item Add \texttt{data\_split} column to identify train/test records
+    \item Remove duplicate transactions (same transaction\_id)
+\end{itemize}
+
+\textbf{Output:} \textbf{fraud\_data} staging table (1,852,394 rows)
+\begin{itemize}
+    \item Raw transaction data with all original columns intact
+    \item Columns: transaction\_id, customer\_id, merchant\_id, amount, transaction\_time, is\_fraud, state, zip, lat, long, city\_pop, merchant\_name, category, data\_split
+\end{itemize}
+
+\vspace{0.5cm}
+
+\subsection{Warehouse Layer}
+
+\textbf{Input:} fraud\_data (staging table)
+
+\textbf{Operations:}
+\begin{itemize}
+    \item Extract unique customers → \textbf{dim\_customer} (999 unique records)
+    \item Extract unique merchants → \textbf{dim\_merchant} (693 unique records)
+    \item Extract unique locations → \textbf{dim\_location} (985 unique records)
+    \item Create hourly time dimension → \textbf{dim\_time} (17,520 hourly buckets)
+    \item Denormalize and aggregate transactions → \textbf{fact\_transactions}
+\end{itemize}
+
+\textbf{Output Tables:}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Table Name} & \textbf{Rows} & \textbf{Purpose} \\
+\hline
+dim\_customer & 999 & Customer attributes (name, age, gender) \\
+dim\_merchant & 693 & Merchant attributes (name, category) \\
+dim\_location & 985 & Geographic attributes (state, zip, lat, long, population) \\
+dim\_time & 17,520 & Time decomposition (hour, day, month, quarter) \\
+fact\_transactions & 1,852,394 & Fact table with transaction details + foreign keys \\
+\hline
+\end{tabular}
+\caption{Warehouse Dimension and Fact Tables}
+\label{tab:warehouse_tables}
+\end{table}
+
+\textbf{Referential Integrity:} 100\% - All foreign keys in fact\_transactions successfully resolve to dimension tables (0\% NULL values)
+
+\vspace{0.5cm}
+
+\subsection{Data Mart Layer}
+
+\textbf{Input:} Warehouse tables (Dimensions + Fact)
+
+\textbf{Operations:} Create specialized analytical views for different business questions
+
+\textbf{Output Views:}
+
+\begin{enumerate}
+    \item \textbf{vw\_fraud\_summary}: Overall fraud statistics
+    \begin{itemize}
+        \item Total transactions, fraud count, fraud rate
+        \item Average transaction amount by fraud status
+    \end{itemize}
+    
+    \item \textbf{vw\_fraud\_by\_merchant}: Merchant-level fraud analysis
+    \begin{itemize}
+        \item Transactions per merchant, fraud count, fraud rate
+        \item Ranking merchants by fraud volume
+    \end{itemize}
+    
+    \item \textbf{vw\_fraud\_by\_location}: Geographic fraud patterns
+    \begin{itemize}
+        \item Transactions per location, fraud count, fraud rate
+        \item Identifying high-risk regions (state, zip)
+    \end{itemize}
+    
+    \item \textbf{vw\_fraud\_by\_customer}: Customer-level fraud analysis
+    \begin{itemize}
+        \item Customer transaction history, fraud incidents
+        \item Identifying repeat fraud victims
+    \end{itemize}
+    
+    \item \textbf{vw\_fraud\_by\_time}: Temporal fraud patterns
+    \begin{itemize}
+        \item Hourly/daily/monthly fraud trends
+        \item Identifying peak fraud times
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5cm}
+
+\subsection{Data Flow Summary}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Layer} & \textbf{Input} & \textbf{Processing} & \textbf{Output} \\
+\hline
+\textbf{Staging} & 2 CSV files & Load + Deduplicate & 1 table: fraud\_data \\
+& 1.85M rows & & (1.85M rows) \\
+\hline
+\textbf{Warehouse} & fraud\_data & Dimension extraction & 4 dimensions + 1 fact \\
+& & + Aggregation & (1.85M fact records) \\
+\hline
+\textbf{Data Mart} & Warehouse & Aggregation + Joins & 5 analytical views \\
+& & for business queries & (ready for BI tools) \\
+\hline
+\end{tabular}
+\caption{Data Warehouse Architecture Flow}
+\label{tab:dataflow}
+\end{table}
+
+\section{Data Preprocessing}
+
+\subsection{Overview}
+
+Our preprocessing workflow follows these key steps:
+\begin{enumerate}
+    \item \textbf{Load data and split}: Load from warehouse and split training set chronologically to simulate real-world conditions
+    \item \textbf{Data cleaning}: Validate data quality, confirm no missing values, duplicates, or corruption issues
+    \item \textbf{Feature engineering}: Create features from temporal (hour, day, month), geographic (distance), and demographic dimensions (age), and compute behavioral statistics from merchant/cardholder history
+    \item \textbf{Feature selection}: Use multiple ranking methods to identify top features with highest discriminative power
+    \item \textbf{Data finalization}: Balance training classes with SMOTE and prepare datasets for modeling
+\end{enumerate}
+
+\subsection{Data Loading and Splitting}
+
+The first step in preprocessing is loading data from the warehouse fact table and dimension tables. Data splitting strategy is critical in fraud detection because fraud patterns evolve over time.
+
+For this reason, we use \textbf{chronological split} instead of traditional random split. This approach preserves temporal order and ensures the training set always precedes validation/test sets, accurately simulating production conditions where we train on historical data and deploy to predict future transactions.
+
+The raw dataset is split using \textbf{chronological split} to minimize information leakage:
+\begin{itemize}
+    \item \textbf{Train split}: 80\% of data (1,037,340 rows) allocated for model training
+    \item \textbf{Validation split}: 20\% of data (259,335 rows) for hyperparameter tuning, all split chronologically by timestamp
+    \item \textbf{Test holdout}: Completely unseen data (separate from train/validation) used only for final evaluation
+\end{itemize}
+
+Reasons for using chronological split:
+\begin{itemize}
+    \item \textbf{Fraud patterns evolve}: Fraud is not a static phenomenon
+    \item \textbf{Realistic production simulation}: Train models on transactions from the past and deploy to predict today's transactions
+    \item \textbf{Avoid temporal leakage}: Random split might accidentally let validation sets see merchant patterns from future dates
+\end{itemize}
+
+\subsection{Data Cleaning and Quality Checks}
+
+Before creating any features, we must ensure the warehouse data is clean and reliable.
+
+\subsubsection{Target Variable Check}
+
+The target column \textit{is\_fraud} is a binary variable (0 = legitimate transaction, 1 = fraud). This dataset is highly imbalanced with fraud comprising only ~0.13\% overall---a major challenge for learning models.
+
+\subsubsection{Duplicate Rows}
+
+Duplicate rows (transactions identical across all columns) are checked and removed. This confirms data integrity.
+
+\subsubsection{Missing Values}
+
+Missing values (NaN, NULL) are checked. Our warehouse data has high quality with minimal missing values.
+
+\subsection{Exploratory Data Analysis (EDA)}
+
+After initial data cleaning, we perform comprehensive exploratory data analysis to understand patterns and distributions that guide feature engineering.
+
+\subsubsection{Key EDA Findings}
+
+From exploratory analysis, several critical fraud patterns emerge:
+
+\textbf{Pattern 1: Temporal Anomalies}
+\begin{itemize}
+    \item \textbf{Late-night activity}: Fraud spikes between 10 PM - 4 AM
+    \item \textbf{Weekend elevation}: Fraud rates are 30-50\% higher on weekends
+    \item \textbf{Seasonal patterns}: Holiday periods show elevated fraud
+\end{itemize}
+
+\textbf{Pattern 2: Geographic Anomalies}
+\begin{itemize}
+    \item \textbf{State variation}: Some states show higher fraud rates due to population and transaction volume
+    \item \textbf{Distance signal}: Transactions occurring very far from cardholder's typical location are suspicious
+    \item \textbf{Impossible travel}: Multiple transactions far apart in short time windows are extreme fraud red flags
+\end{itemize}
+
+\textbf{Pattern 3: Amount-Based Signals}
+\begin{itemize}
+    \item \textbf{Higher amounts}: Fraudulent transactions average \$149 vs \$62 for legitimate (2.4x difference)
+    \item \textbf{Outliers}: Very large transactions (>\$1000) warrant additional scrutiny
+\end{itemize}
+
+\subsection{Feature Engineering}
+
+Feature engineering creates new features from raw data to capture important patterns. For fraud detection, we create features based on three main sources:
+\begin{enumerate}
+    \item \textbf{Temporal information}: Transaction timing patterns
+    \item \textbf{Geographic information}: Distance from cardholder location to merchant location
+    \item \textbf{Behavioral information}: Individual cardholder and merchant patterns
+\end{enumerate}
+
+\subsubsection{Temporal Features}
+
+From transaction timestamp, we extract:
+\begin{itemize}
+    \item \textbf{hour}: Hour of day (0-23)
+    \item \textbf{dayofweek}: Day of week (0=Monday, 6=Sunday)
+    \item \textbf{month}: Month of year
+    \item \textbf{is\_weekend}: Binary variable (1 if weekend)
+\end{itemize}
+
+\subsubsection{Geographic Features}
+
+\textbf{distance\_km}: We calculate the Haversine distance from cardholder location to merchant location:
+\[\text{distance} = 2R \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta\text{lat}}{2}\right) + \cos(\text{lat}_1) \cos(\text{lat}_2) \sin^2\left(\frac{\Delta\text{lon}}{2}\right)}\right)\]
+where $R = 6371$ km is Earth's radius.
+
+\subsubsection{Amount Features}
+
+\textbf{amt\_log}: Log transformation of transaction amount ($\log(1 + \text{amt})$) to reduce outlier impact and normalize distribution.
+
+\subsubsection{Advanced Behavioral Features}
+
+The most important step in fraud detection is capturing behavioral patterns:
+
+\begin{table}[H]
+\centering
+\caption{Advanced Behavioral Features}
+\footnotesize
+\begin{tabular}{|l|p{6cm}|}
+\hline
+\textbf{Feature} & \textbf{Description} \\
+\hline
+trans\_count\_hourly & Number of cardholder transactions in current hour \\
+\hline
+trans\_count\_daily & Number of cardholder transactions in current day \\
+\hline
+merchant\_fraud\_rate & Historical fraud rate of merchant \\
+\hline
+merchant\_trans\_count & Total transaction count via merchant \\
+\hline
+merchant\_avg\_amount & Average amount via merchant \\
+\hline
+amt\_x\_distance & Interaction: amount $\times$ distance \\
+\hline
+time\_since\_last\_trans & Time elapsed (minutes) since previous transaction \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Feature Scaling and Standardization}
+
+Raw features have dramatically different scales. We apply \textbf{StandardScaler} to transform all features to mean=0 and standard deviation=1:
+
+\[z = \frac{x - \mu}{\sigma}\]
+
+where $\mu$ is the feature mean and $\sigma$ is the standard deviation, both computed from the training set.
+
+\textbf{Critical}: The scaler is fit ONLY on the training set, then applied consistently to all partitions to prevent data leakage.
+
+\subsection{Feature Selection}
+
+At this point, we have ~50-60 features from feature engineering. To select the most valuable features, we use 3 independent ranking methods:
+
+\subsubsection{Correlation-Based Ranking}
+
+Calculate Pearson correlation coefficient between each feature and target variable.
+
+\subsubsection{Mutual Information (MI)}
+
+This method examines dependencies between features and targets, including non-linear relationships:
+\[I(X; y) = H(y) - H(y|X)\]
+
+\subsubsection{Tree-Based Feature Importance}
+
+Train a Random Forest and extract feature importance scores from the Gini index.
+
+\subsubsection{Consolidated Score}
+
+Combine all three methods by averaging normalized scores to select top-20 features:
+\[Score = \frac{Corr + MI + TreeImp}{3}\]
+
+\subsection{SMOTE Resampling - Balancing Training Classes}
+
+The biggest problem in fraud detection is extreme class imbalance: fraud comprises only 0.166\% of training data. SMOTE (Synthetic Minority Over-sampling Technique) generates synthetic fraud examples:
+\begin{itemize}
+    \item Find k-nearest neighbors of each fraud example
+    \item Create synthetic points between fraud examples and neighbors
+    \item Repeat until balanced (fraud = legitimate = 50\%)
+\end{itemize}
+
+Result: balanced training set helps models learn patterns of both classes. However, validation/test are kept original (not balanced) to reflect reality.
+
+\begin{table}[H]
+\centering
+\caption{Final 20 Features for Modeling}
+\small
+\begin{tabular}{|c|l|}
+\hline
+\textbf{No} & \textbf{Feature} \\
+\hline
+1 & distance\_km \\
+\hline
+2 & amt\_log \\
+\hline
+3 & merchant\_fraud\_rate \\
+\hline
+4 & hour \\
+\hline
+5 & trans\_count\_hourly \\
+\hline
+6 & trans\_count\_daily \\
+\hline
+7 & amt \\
+\hline
+8 & merchant\_avg\_amount \\
+\hline
+9 & age \\
+\hline
+10 & is\_weekend \\
+\hline
+11 & dayofweek \\
+\hline
+12 & category \\
+\hline
+13 & month \\
+\hline
+14 & amt\_x\_distance \\
+\hline
+15 & merchant\_trans\_count \\
+\hline
+16 & time\_since\_last\_trans \\
+\hline
+17 & age\_group \\
+\hline
+18 & state \\
+\hline
+19 & gender \\
+\hline
+20 & fraud\_dist\_percentile \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Data Ready for Modeling}
+
+After all preprocessing and feature selection steps, data is ready for modeling with 3 separate datasets:
+
+\begin{itemize}
+    \item \textbf{Training set} (1,037,340 rows): Used to train the model, SMOTE-balanced
+    \item \textbf{Validation set} (259,335 rows): Used to tune hyperparameters, original imbalanced distribution
+    \item \textbf{Test holdout} (555,719 rows): Final evaluation set, completely unseen data
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Summary of Final Data for Modeling}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Dataset} & \textbf{Rows} & \textbf{Features} & \textbf{Fraud Rate} & \textbf{Purpose} \\
+\hline
+Training & 1,037,340 & 20 & 0.166\% & Train the model \\
+\hline
+Validation & 259,335 & 20 & 0.089\% & Tune hyperparameters \\
+\hline
+Test holdout & 555,719 & 20 & 0.080\% & Final evaluation \\
+\hline
+\end{tabular}
+\end{table}
+
