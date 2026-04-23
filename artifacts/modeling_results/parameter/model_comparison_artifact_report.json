@@ -1,10 +1,13 @@
 {
   "base_dir": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results",
-  "num_pickles_found": 9,
+  "num_pickles_found": 8,
   "counts_by_group": {
     "trained_models": 8,
     "pipeline_artifact": 1
   },
+  "included_groups": [
+    "trained_models"
+  ],
   "pickles": [
     {
       "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results\\trained_models\\balanced_smote__ANN_MLP.pkl",
@@ -12,7 +15,6 @@
       "load_status": "ok",
       "object_type": "Pipeline",
       "module": "sklearn.pipeline",
-      "model_repr": "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('svd', TruncatedSVD(n_components=20, random_state=42)),\n                ('clf',\n                 MLPClassifier(early_stopping=True, hidden_layer_sizes=(64, 32),\n                               max_iter=40, random_state=42))])",
       "pipeline_steps": [
         "prep",
         "svd",
@@ -21,43 +23,44 @@
       "final_estimator_type": "MLPClassifier",
       "classes_": "[0 1]",
       "n_features_in_": 20,
-      "params": {
-        "memory": null,
-        "steps": [
-          [
-            "prep",
-            "ColumnTransformer(transformers=[('num',\n                                 Pipeline(steps=[('imputer',\n                                                  SimpleImputer(strategy='median')),\n                                                 ('scaler', StandardScaler())]),\n                                 ['amt', 'amt_log', 'trans_count_hourly',\n                                  'amt_x_distance', 'hour',\n                                  'merchant_avg_amount', 'merchant_fraud_rate',\n                                  'is_weekend', 'merchant_trans_count', 'age',\n                                  'trans_count_daily', 'dayofweek',\n                                  'time_since_last_transaction_min', 'month',\n                                  'city_pop', 'lat', 'long', 'distance_km',\n                                  'merch_long', 'merch_lat'])])"
-          ],
-          [
-            "svd",
-            "TruncatedSVD(n_components=20, random_state=42)"
-          ],
-          [
-            "clf",
-            "MLPClassifier(early_stopping=True, hidden_layer_sizes=(64, 32), max_iter=40,\n              random_state=42)"
-          ]
+      "clf_class": "MLPClassifier",
+      "clf_module": "sklearn.neural_network._multilayer_perceptron",
+      "clf_params": {
+        "activation": "relu",
+        "alpha": 0.0001,
+        "batch_size": "auto",
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "early_stopping": true,
+        "epsilon": 1e-08,
+        "hidden_layer_sizes": [
+          64,
+          32
         ],
-        "transform_input": null,
-        "verbose": false
+        "learning_rate": "constant",
+        "learning_rate_init": 0.001,
+        "max_fun": 15000,
+        "max_iter": 40,
+        "momentum": 0.9,
+        "n_iter_no_change": 10,
+        "nesterovs_momentum": true,
+        "power_t": 0.5,
+        "random_state": 42,
+        "shuffle": true,
+        "solver": "adam",
+        "tol": 0.0001,
+        "validation_fraction": 0.1,
+        "verbose": false,
+        "warm_start": false
       },
-      "important_attributes": [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "fit",
-        "get_params",
-        "classes_",
-        "n_features_in_"
-      ],
-      "learned_attributes_sample": [
-        "_repr_html_",
-        "_repr_mimebundle_",
-        "_sk_visual_block_",
-        "classes_",
-        "feature_names_in_",
-        "n_features_in_"
-      ]
+      "clf_params_count": 23,
+      "clf_capabilities": {
+        "has_predict": true,
+        "has_predict_proba": true,
+        "has_feature_importances": false,
+        "has_coef": false
+      },
+      "pipeline_param_summary": {}
     },
     {
       "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results\\trained_models\\balanced_smote__Bayesian_GaussianNB.pkl",
@@ -65,7 +68,6 @@
       "load_status": "ok",
       "object_type": "Pipeline",
       "module": "sklearn.pipeline",
-      "model_repr": "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('svd', TruncatedSVD(n_components=20, random_state=42)),\n                ('clf', GaussianNB())])",
       "pipeline_steps": [
         "prep",
         "svd",
@@ -74,43 +76,20 @@
       "final_estimator_type": "GaussianNB",
       "classes_": "[0 1]",
       "n_features_in_": 20,
-      "params": {
-        "memory": null,
-        "steps": [
-          [
-            "prep",
-            "ColumnTransformer(transformers=[('num',\n                                 Pipeline(steps=[('imputer',\n                                                  SimpleImputer(strategy='median')),\n                                                 ('scaler', StandardScaler())]),\n                                 ['amt', 'amt_log', 'trans_count_hourly',\n                                  'amt_x_distance', 'hour',\n                                  'merchant_avg_amount', 'merchant_fraud_rate',\n                                  'is_weekend', 'merchant_trans_count', 'age',\n                                  'trans_count_daily', 'dayofweek',\n                                  'time_since_last_transaction_min', 'month',\n                                  'city_pop', 'lat', 'long', 'distance_km',\n                                  'merch_long', 'merch_lat'])])"
-          ],
-          [
-            "svd",
-            "TruncatedSVD(n_components=20, random_state=42)"
-          ],
-          [
-            "clf",
-            "GaussianNB()"
-          ]
-        ],
-        "transform_input": null,
-        "verbose": false
+      "clf_class": "GaussianNB",
+      "clf_module": "sklearn.naive_bayes",
+      "clf_params": {
+        "priors": null,
+        "var_smoothing": 1e-09
       },
-      "important_attributes": [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "fit",
-        "get_params",
-        "classes_",
-        "n_features_in_"
-      ],
-      "learned_attributes_sample": [
-        "_repr_html_",
-        "_repr_mimebundle_",
-        "_sk_visual_block_",
-        "classes_",
-        "feature_names_in_",
-        "n_features_in_"
-      ]
+      "clf_params_count": 2,
+      "clf_capabilities": {
+        "has_predict": true,
+        "has_predict_proba": true,
+        "has_feature_importances": false,
+        "has_coef": false
+      },
+      "pipeline_param_summary": {}
     },
     {
       "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results\\trained_models\\balanced_smote__DecisionTree.pkl",
@@ -118,7 +97,6 @@
       "load_status": "ok",
       "object_type": "Pipeline",
       "module": "sklearn.pipeline",
-      "model_repr": "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('clf',\n                 DecisionTreeClassifier(class_weight='balanced', max_depth=12,\n                                        min_samples_leaf=20,\n                                        random_state=42))])",
       "pipeline_steps": [
         "prep",
         "clf"
@@ -126,39 +104,31 @@
       "final_estimator_type": "DecisionTreeClassifier",
       "classes_": "[0 1]",
       "n_features_in_": 20,
-      "params": {
-        "memory": null,
-        "steps": [
-          [
-            "prep",
-            "ColumnTransformer(transformers=[('num',\n                                 Pipeline(steps=[('imputer',\n                                                  SimpleImputer(strategy='median')),\n                                                 ('scaler', StandardScaler())]),\n                                 ['amt', 'amt_log', 'trans_count_hourly',\n                                  'amt_x_distance', 'hour',\n                                  'merchant_avg_amount', 'merchant_fraud_rate',\n                                  'is_weekend', 'merchant_trans_count', 'age',\n                                  'trans_count_daily', 'dayofweek',\n                                  'time_since_last_transaction_min', 'month',\n                                  'city_pop', 'lat', 'long', 'distance_km',\n                                  'merch_long', 'merch_lat'])])"
-          ],
-          [
-            "clf",
-            "DecisionTreeClassifier(class_weight='balanced', max_depth=12,\n                       min_samples_leaf=20, random_state=42)"
-          ]
-        ],
-        "transform_input": null,
-        "verbose": false
+      "clf_class": "DecisionTreeClassifier",
+      "clf_module": "sklearn.tree._classes",
+      "clf_params": {
+        "ccp_alpha": 0.0,
+        "class_weight": "balanced",
+        "criterion": "gini",
+        "max_depth": 12,
+        "max_features": null,
+        "max_leaf_nodes": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 20,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "random_state": 42,
+        "splitter": "best"
       },
-      "important_attributes": [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "fit",
-        "get_params",
-        "classes_",
-        "n_features_in_"
-      ],
-      "learned_attributes_sample": [
-        "_repr_html_",
-        "_repr_mimebundle_",
-        "_sk_visual_block_",
-        "classes_",
-        "feature_names_in_",
-        "n_features_in_"
-      ]
+      "clf_params_count": 13,
+      "clf_capabilities": {
+        "has_predict": true,
+        "has_predict_proba": true,
+        "has_feature_importances": true,
+        "has_coef": false
+      },
+      "pipeline_param_summary": {}
     },
     {
       "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results\\trained_models\\balanced_smote__LogisticRegression.pkl",
@@ -166,7 +136,6 @@
       "load_status": "ok",
       "object_type": "Pipeline",
       "module": "sklearn.pipeline",
-      "model_repr": "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('clf',\n                 LogisticRegression(class_weight='balanced', max_iter=300,\n                                    n_jobs=-1, random_state=42))])",
       "pipeline_steps": [
         "prep",
         "clf"
@@ -174,39 +143,32 @@
       "final_estimator_type": "LogisticRegression",
       "classes_": "[0 1]",
       "n_features_in_": 20,
-      "params": {
-        "memory": null,
-        "steps": [
-          [
-            "prep",
-            "ColumnTransformer(transformers=[('num',\n                                 Pipeline(steps=[('imputer',\n                                                  SimpleImputer(strategy='median')),\n                                                 ('scaler', StandardScaler())]),\n                                 ['amt', 'amt_log', 'trans_count_hourly',\n                                  'amt_x_distance', 'hour',\n                                  'merchant_avg_amount', 'merchant_fraud_rate',\n                                  'is_weekend', 'merchant_trans_count', 'age',\n                                  'trans_count_daily', 'dayofweek',\n                                  'time_since_last_transaction_min', 'month',\n                                  'city_pop', 'lat', 'long', 'distance_km',\n                                  'merch_long', 'merch_lat'])])"
-          ],
-          [
-            "clf",
-            "LogisticRegression(class_weight='balanced', max_iter=300, n_jobs=-1,\n                   random_state=42)"
-          ]
-        ],
-        "transform_input": null,
-        "verbose": false
+      "clf_class": "LogisticRegression",
+      "clf_module": "sklearn.linear_model._logistic",
+      "clf_params": {
+        "C": 1.0,
+        "class_weight": "balanced",
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": 0.0,
+        "max_iter": 300,
+        "n_jobs": -1,
+        "penalty": "deprecated",
+        "random_state": 42,
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false
       },
-      "important_attributes": [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "fit",
-        "get_params",
-        "classes_",
-        "n_features_in_"
-      ],
-      "learned_attributes_sample": [
-        "_repr_html_",
-        "_repr_mimebundle_",
-        "_sk_visual_block_",
-        "classes_",
-        "feature_names_in_",
-        "n_features_in_"
-      ]
+      "clf_params_count": 14,
+      "clf_capabilities": {
+        "has_predict": true,
+        "has_predict_proba": true,
+        "has_feature_importances": false,
+        "has_coef": true
+      },
+      "pipeline_param_summary": {}
     },
     {
       "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results\\trained_models\\imbalanced__ANN_MLP.pkl",
@@ -214,7 +176,6 @@
       "load_status": "ok",
       "object_type": "Pipeline",
       "module": "sklearn.pipeline",
-      "model_repr": "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('svd', TruncatedSVD(n_components=20, random_state=42)),\n                ('clf',\n                 MLPClassifier(early_stopping=True, hidden_layer_sizes=(64, 32),\n                               random_state=42))])",
       "pipeline_steps": [
         "prep",
         "svd",
@@ -223,43 +184,44 @@
       "final_estimator_type": "MLPClassifier",
       "classes_": "[0 1]",
       "n_features_in_": 20,
-      "params": {
-        "memory": null,
-        "steps": [
-          [
-            "prep",
-            "ColumnTransformer(transformers=[('num',\n                                 Pipeline(steps=[('imputer',\n                                                  SimpleImputer(strategy='median')),\n                                                 ('scaler', StandardScaler())]),\n                                 ['amt', 'amt_log', 'trans_count_hourly',\n                                  'amt_x_distance', 'hour',\n                                  'merchant_avg_amount', 'merchant_fraud_rate',\n                                  'is_weekend', 'merchant_trans_count', 'age',\n                                  'trans_count_daily', 'dayofweek',\n                                  'time_since_last_transaction_min', 'month',\n                                  'city_pop', 'lat', 'long', 'distance_km',\n                                  'merch_long', 'merch_lat'])])"
-          ],
-          [
-            "svd",
-            "TruncatedSVD(n_components=20, random_state=42)"
-          ],
-          [
-            "clf",
-            "MLPClassifier(early_stopping=True, hidden_layer_sizes=(64, 32), random_state=42)"
-          ]
+      "clf_class": "MLPClassifier",
+      "clf_module": "sklearn.neural_network._multilayer_perceptron",
+      "clf_params": {
+        "activation": "relu",
+        "alpha": 0.0001,
+        "batch_size": "auto",
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "early_stopping": true,
+        "epsilon": 1e-08,
+        "hidden_layer_sizes": [
+          64,
+          32
         ],
-        "transform_input": null,
-        "verbose": false
+        "learning_rate": "constant",
+        "learning_rate_init": 0.001,
+        "max_fun": 15000,
+        "max_iter": 200,
+        "momentum": 0.9,
+        "n_iter_no_change": 10,
+        "nesterovs_momentum": true,
+        "power_t": 0.5,
+        "random_state": 42,
+        "shuffle": true,
+        "solver": "adam",
+        "tol": 0.0001,
+        "validation_fraction": 0.1,
+        "verbose": false,
+        "warm_start": false
       },
-      "important_attributes": [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "fit",
-        "get_params",
-        "classes_",
-        "n_features_in_"
-      ],
-      "learned_attributes_sample": [
-        "_repr_html_",
-        "_repr_mimebundle_",
-        "_sk_visual_block_",
-        "classes_",
-        "feature_names_in_",
-        "n_features_in_"
-      ]
+      "clf_params_count": 23,
+      "clf_capabilities": {
+        "has_predict": true,
+        "has_predict_proba": true,
+        "has_feature_importances": false,
+        "has_coef": false
+      },
+      "pipeline_param_summary": {}
     },
     {
       "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results\\trained_models\\imbalanced__Bayesian_GaussianNB.pkl",
@@ -267,7 +229,6 @@
       "load_status": "ok",
       "object_type": "Pipeline",
       "module": "sklearn.pipeline",
-      "model_repr": "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('svd', TruncatedSVD(n_components=20, random_state=42)),\n                ('clf', GaussianNB())])",
       "pipeline_steps": [
         "prep",
         "svd",
@@ -276,43 +237,20 @@
       "final_estimator_type": "GaussianNB",
       "classes_": "[0 1]",
       "n_features_in_": 20,
-      "params": {
-        "memory": null,
-        "steps": [
-          [
-            "prep",
-            "ColumnTransformer(transformers=[('num',\n                                 Pipeline(steps=[('imputer',\n                                                  SimpleImputer(strategy='median')),\n                                                 ('scaler', StandardScaler())]),\n                                 ['amt', 'amt_log', 'trans_count_hourly',\n                                  'amt_x_distance', 'hour',\n                                  'merchant_avg_amount', 'merchant_fraud_rate',\n                                  'is_weekend', 'merchant_trans_count', 'age',\n                                  'trans_count_daily', 'dayofweek',\n                                  'time_since_last_transaction_min', 'month',\n                                  'city_pop', 'lat', 'long', 'distance_km',\n                                  'merch_long', 'merch_lat'])])"
-          ],
-          [
-            "svd",
-            "TruncatedSVD(n_components=20, random_state=42)"
-          ],
-          [
-            "clf",
-            "GaussianNB()"
-          ]
-        ],
-        "transform_input": null,
-        "verbose": false
+      "clf_class": "GaussianNB",
+      "clf_module": "sklearn.naive_bayes",
+      "clf_params": {
+        "priors": null,
+        "var_smoothing": 1e-09
       },
-      "important_attributes": [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "fit",
-        "get_params",
-        "classes_",
-        "n_features_in_"
-      ],
-      "learned_attributes_sample": [
-        "_repr_html_",
-        "_repr_mimebundle_",
-        "_sk_visual_block_",
-        "classes_",
-        "feature_names_in_",
-        "n_features_in_"
-      ]
+      "clf_params_count": 2,
+      "clf_capabilities": {
+        "has_predict": true,
+        "has_predict_proba": true,
+        "has_feature_importances": false,
+        "has_coef": false
+      },
+      "pipeline_param_summary": {}
     },
     {
       "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results\\trained_models\\imbalanced__DecisionTree.pkl",
@@ -320,7 +258,6 @@
       "load_status": "ok",
       "object_type": "Pipeline",
       "module": "sklearn.pipeline",
-      "model_repr": "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('clf',\n                 DecisionTreeClassifier(class_weight='balanced', max_depth=12,\n                                        min_samples_leaf=20,\n                                        random_state=42))])",
       "pipeline_steps": [
         "prep",
         "clf"
@@ -328,39 +265,31 @@
       "final_estimator_type": "DecisionTreeClassifier",
       "classes_": "[0 1]",
       "n_features_in_": 20,
-      "params": {
-        "memory": null,
-        "steps": [
-          [
-            "prep",
-            "ColumnTransformer(transformers=[('num',\n                                 Pipeline(steps=[('imputer',\n                                                  SimpleImputer(strategy='median')),\n                                                 ('scaler', StandardScaler())]),\n                                 ['amt', 'amt_log', 'trans_count_hourly',\n                                  'amt_x_distance', 'hour',\n                                  'merchant_avg_amount', 'merchant_fraud_rate',\n                                  'is_weekend', 'merchant_trans_count', 'age',\n                                  'trans_count_daily', 'dayofweek',\n                                  'time_since_last_transaction_min', 'month',\n                                  'city_pop', 'lat', 'long', 'distance_km',\n                                  'merch_long', 'merch_lat'])])"
-          ],
-          [
-            "clf",
-            "DecisionTreeClassifier(class_weight='balanced', max_depth=12,\n                       min_samples_leaf=20, random_state=42)"
-          ]
-        ],
-        "transform_input": null,
-        "verbose": false
+      "clf_class": "DecisionTreeClassifier",
+      "clf_module": "sklearn.tree._classes",
+      "clf_params": {
+        "ccp_alpha": 0.0,
+        "class_weight": "balanced",
+        "criterion": "gini",
+        "max_depth": 12,
+        "max_features": null,
+        "max_leaf_nodes": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 20,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "random_state": 42,
+        "splitter": "best"
       },
-      "important_attributes": [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "fit",
-        "get_params",
-        "classes_",
-        "n_features_in_"
-      ],
-      "learned_attributes_sample": [
-        "_repr_html_",
-        "_repr_mimebundle_",
-        "_sk_visual_block_",
-        "classes_",
-        "feature_names_in_",
-        "n_features_in_"
-      ]
+      "clf_params_count": 13,
+      "clf_capabilities": {
+        "has_predict": true,
+        "has_predict_proba": true,
+        "has_feature_importances": true,
+        "has_coef": false
+      },
+      "pipeline_param_summary": {}
     },
     {
       "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results\\trained_models\\imbalanced__LogisticRegression.pkl",
@@ -368,7 +297,6 @@
       "load_status": "ok",
       "object_type": "Pipeline",
       "module": "sklearn.pipeline",
-      "model_repr": "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('clf',\n                 LogisticRegression(class_weight='balanced', max_iter=300,\n                                    n_jobs=-1, random_state=42))])",
       "pipeline_steps": [
         "prep",
         "clf"
@@ -376,98 +304,32 @@
       "final_estimator_type": "LogisticRegression",
       "classes_": "[0 1]",
       "n_features_in_": 20,
-      "params": {
-        "memory": null,
-        "steps": [
-          [
-            "prep",
-            "ColumnTransformer(transformers=[('num',\n                                 Pipeline(steps=[('imputer',\n                                                  SimpleImputer(strategy='median')),\n                                                 ('scaler', StandardScaler())]),\n                                 ['amt', 'amt_log', 'trans_count_hourly',\n                                  'amt_x_distance', 'hour',\n                                  'merchant_avg_amount', 'merchant_fraud_rate',\n                                  'is_weekend', 'merchant_trans_count', 'age',\n                                  'trans_count_daily', 'dayofweek',\n                                  'time_since_last_transaction_min', 'month',\n                                  'city_pop', 'lat', 'long', 'distance_km',\n                                  'merch_long', 'merch_lat'])])"
-          ],
-          [
-            "clf",
-            "LogisticRegression(class_weight='balanced', max_iter=300, n_jobs=-1,\n                   random_state=42)"
-          ]
-        ],
-        "transform_input": null,
-        "verbose": false
+      "clf_class": "LogisticRegression",
+      "clf_module": "sklearn.linear_model._logistic",
+      "clf_params": {
+        "C": 1.0,
+        "class_weight": "balanced",
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": 0.0,
+        "max_iter": 300,
+        "n_jobs": -1,
+        "penalty": "deprecated",
+        "random_state": 42,
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false
       },
-      "important_attributes": [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "fit",
-        "get_params",
-        "classes_",
-        "n_features_in_"
-      ],
-      "learned_attributes_sample": [
-        "_repr_html_",
-        "_repr_mimebundle_",
-        "_sk_visual_block_",
-        "classes_",
-        "feature_names_in_",
-        "n_features_in_"
-      ]
-    },
-    {
-      "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\pipeline_artifact\\inference_pipeline.pkl",
-      "artifact_name": "inference_pipeline.pkl",
-      "stubbed_main_classes": [
-        "PreprocessingTransformer",
-        "FeatureSelector",
-        "NumericFillna"
-      ],
-      "load_status": "ok",
-      "object_type": "Pipeline",
-      "module": "sklearn.pipeline",
-      "model_repr": "Pipeline(steps=[('feature_engineering',\n                 <__main__.PreprocessingTransformer object at 0x000001DC37388DA0>),\n                ('feature_selector',\n                 <__main__.FeatureSelector object at 0x000001DC374E4DA0>),\n                ('fill_missing',\n                 <__main__.NumericFillna object at 0x000001DC374E48C0>),\n                ('model',\n                 Pipeline(steps=[('prep',\n                                  ColumnTransformer(transformers=[('num',\n                                                                   Pipeline(steps=[('imputer',\n                                                                                    SimpleI...\n                                                                    'merchant_fraud_rate',\n                                                                    'is_weekend',\n                                                                    'merchant_trans_count',\n                                                                    'age',\n                                                                    'trans_count_daily',\n                                                                    'dayofweek',\n                                                                    'time_since_last_transaction_min',\n                                                                    'month',\n                                                                    'city_pop',\n                                                                    'lat',\n                                                                    'long',\n                                                                    'distance_km',\n                                                                    'merch_long',\n                                                                    'merch_lat'])])),\n                                 ('svd',\n                                  TruncatedSVD(n_components=20,\n                                               random_state=42)),\n                                 ('clf',\n                                  MLPClassifier(early_stopping=True,\n                                                hidden_layer_sizes=(64, 32),\n                                                random_state=42))]))])",
-      "pipeline_steps": [
-        "feature_engineering",
-        "feature_selector",
-        "fill_missing",
-        "model"
-      ],
-      "final_estimator_type": "Pipeline",
-      "classes_": "[0 1]",
-      "params": {
-        "memory": null,
-        "steps": [
-          [
-            "feature_engineering",
-            "<__main__.PreprocessingTransformer object at 0x000001DC37388DA0>"
-          ],
-          [
-            "feature_selector",
-            "<__main__.FeatureSelector object at 0x000001DC374E4DA0>"
-          ],
-          [
-            "fill_missing",
-            "<__main__.NumericFillna object at 0x000001DC374E48C0>"
-          ],
-          [
-            "model",
-            "Pipeline(steps=[('prep',\n                 ColumnTransformer(transformers=[('num',\n                                                  Pipeline(steps=[('imputer',\n                                                                   SimpleImputer(strategy='median')),\n                                                                  ('scaler',\n                                                                   StandardScaler())]),\n                                                  ['amt', 'amt_log',\n                                                   'trans_count_hourly',\n                                                   'amt_x_distance', 'hour',\n                                                   'merchant_avg_amount',\n                                                   'merchant_fraud_rate',\n                                                   'is_weekend',\n                                                   'merchant_trans_count',\n                                                   'age', 'trans_count_daily',\n                                                   'dayofweek',\n                                                   'time_since_last_transaction_min',\n                                                   'month', 'city_pop', 'lat',\n                                                   'long', 'distance_km',\n                                                   'merch_long',\n                                                   'merch_lat'])])),\n                ('svd', TruncatedSVD(n_components=20, random_state=42)),\n                ('clf',\n                 MLPClassifier(early_stopping=True, hidden_layer_sizes=(64, 32),\n                               random_state=42))])"
-          ]
-        ],
-        "transform_input": null,
-        "verbose": false
+      "clf_params_count": 14,
+      "clf_capabilities": {
+        "has_predict": true,
+        "has_predict_proba": true,
+        "has_feature_importances": false,
+        "has_coef": true
       },
-      "important_attributes": [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "fit",
-        "get_params",
-        "classes_"
-      ],
-      "learned_attributes_sample": [
-        "_repr_html_",
-        "_repr_mimebundle_",
-        "_sk_visual_block_",
-        "classes_"
-      ]
+      "pipeline_param_summary": {}
     }
   ],
   "data_source": "pkl_only"

@@ -4,13 +4,12 @@ import streamlit as st
 from pathlib import Path
 import json
 import pandas as pd
-import re
 
 from shared import load_model_results
 
 
 @st.cache_data(show_spinner=False)
-def load_model_parameter_report() -> dict:
+def load_model_parameter_report(report_mtime_ns: int) -> dict:
     report_path = Path(__file__).resolve().parents[1] / "artifacts" / "modeling_results" / "parameter" / "model_comparison_artifact_report.json"
     if not report_path.exists():
         return {}
@@ -21,48 +20,10 @@ def load_model_parameter_report() -> dict:
         return {}
 
 
-def extract_model_repr_table(model_repr: str) -> pd.DataFrame:
-    rows: list[dict[str, str]] = []
-    explanations = {
-        "Pipeline": "Cho biết model có được đóng gói theo sklearn Pipeline hay không.",
-        "Preprocessor": "Khối tiền xử lý đặc trưng trước khi đưa vào mô hình.",
-        "Imputer strategy": "Cách xử lý giá trị thiếu trong dữ liệu đầu vào.",
-        "Scaler": "Phương pháp chuẩn hóa/scale đặc trưng số.",
-        "SVD n_components": "Số chiều giữ lại sau bước giảm chiều bằng TruncatedSVD.",
-        "SVD random_state": "Seed cố định để tái lập kết quả của bước SVD.",
-        "SVD": "Cho biết pipeline có dùng giảm chiều SVD hay không.",
-        "Classifier": "Thuật toán phân loại ở bước cuối của pipeline.",
-        "Classifier params": "Các siêu tham số chính của mô hình phân loại.",
-    }
-
-    def add_row(field: str, value: str) -> None:
-        rows.append({"Field": field, "Value": value, "Explanation": explanations.get(field, "")})
-
-    add_row("Pipeline", "Yes" if "Pipeline(" in model_repr else "No")
-    add_row("Preprocessor", "ColumnTransformer" if "ColumnTransformer" in model_repr else "N/A")
-
-    imputer_match = re.search(r"SimpleImputer\(strategy='([^']+)'\)", model_repr)
-    add_row("Imputer strategy", imputer_match.group(1) if imputer_match else "N/A")
-
-    scaler_match = re.search(r"(StandardScaler|MinMaxScaler|RobustScaler)\(\)", model_repr)
-    add_row("Scaler", scaler_match.group(1) if scaler_match else "N/A")
-
-    svd_match = re.search(r"TruncatedSVD\(n_components=(\d+),\s*random_state=(\d+)\)", model_repr)
-    if svd_match:
-        add_row("SVD n_components", svd_match.group(1))
-        add_row("SVD random_state", svd_match.group(2))
-    else:
-        add_row("SVD", "Not used")
-
-    clf_match = re.search(r"\('clf',\s*([A-Za-z_][A-Za-z0-9_]*)\((.*?)\)\)\]", model_repr, flags=re.DOTALL)
-    if clf_match:
-        clf_name = clf_match.group(1)
-        clf_params_raw = " ".join(clf_match.group(2).split())
-        add_row("Classifier", clf_name)
-        add_row("Classifier params", clf_params_raw if clf_params_raw else "(default)")
-    else:
-        add_row("Classifier", "N/A")
-
+def params_to_table(params: dict) -> pd.DataFrame:
+    if not isinstance(params, dict) or not params:
+        return pd.DataFrame(columns=["parameter", "value"])
+    rows = [{"parameter": str(k), "value": str(v)} for k, v in sorted(params.items(), key=lambda x: x[0])]
     return pd.DataFrame(rows)
 
 
@@ -141,7 +102,9 @@ def render_evaluation_models() -> None:
             st.pyplot(fig)
 
     with st.expander("🧩 Detailed Parameters", expanded=False):
-        report = load_model_parameter_report()
+        report_path = Path(__file__).resolve().parents[1] / "artifacts" / "modeling_results" / "parameter" / "model_comparison_artifact_report.json"
+        report_mtime_ns = report_path.stat().st_mtime_ns if report_path.exists() else 0
+        report = load_model_parameter_report(report_mtime_ns)
         pickles = report.get("pickles", []) if isinstance(report, dict) else []
 
         if not pickles:
@@ -179,9 +142,55 @@ def render_evaluation_models() -> None:
                 selected_item = next((x for x in pickles if x.get("artifact_name") == selected_artifact), None)
 
                 if selected_item:
-                    model_repr = str(selected_item.get("model_repr", ""))
-                    st.markdown("#### Model Representation (Structured Table)")
-                    st.dataframe(extract_model_repr_table(model_repr), width="stretch", hide_index=True)
+                    st.markdown("#### Table: Core Model Information")
+                    core_explanations = {
+                        "clf_class": "Tên thuật toán classifier ở bước cuối pipeline.",
+                        "clf_module": "Module Python của classifier (thư viện/namespace).",
+                        "classes_": "Danh sách nhãn lớp mà model học được.",
+                        "pipeline_steps": "Thứ tự các bước xử lý trong pipeline.",
+                    }
+                    core_rows = [
+                        {
+                            "field": "clf_class",
+                            "value": str(selected_item.get("clf_class", "N/A")),
+                            "explanation": core_explanations["clf_class"],
+                        },
+                        {
+                            "field": "clf_module",
+                            "value": str(selected_item.get("clf_module", "N/A")),
+                            "explanation": core_explanations["clf_module"],
+                        },
+                        {
+                            "field": "classes_",
+                            "value": str(selected_item.get("classes_", "N/A")),
+                            "explanation": core_explanations["classes_"],
+                        },
+                        {
+                            "field": "pipeline_steps",
+                            "value": " -> ".join(selected_item.get("pipeline_steps", [])) or "N/A",
+                            "explanation": core_explanations["pipeline_steps"],
+                        },
+                    ]
+                    st.dataframe(pd.DataFrame(core_rows), width="stretch", hide_index=True)
+
+                    st.markdown("#### Table: Classifier Parameters")
+                    # Backward compatibility: some old reports used clf_params_non_default.
+                    clf_params = selected_item.get("clf_params", selected_item.get("clf_params_non_default", {}))
+                    if not isinstance(clf_params, dict):
+                        clf_params = {}
+                    clf_param_rows = []
+                    for param_name, param_value in sorted(clf_params.items(), key=lambda x: x[0]):
+                        clf_param_rows.append(
+                            {
+                                "parameter": str(param_name),
+                                "value": str(param_value),
+                                # "explanation": "Hyperparameter của classifier đọc từ pkl (get_params deep=True).",
+                            }
+                        )
+                    if not clf_param_rows:
+                        st.info("No classifier parameters found.")
+                    else:
+                        st.dataframe(pd.DataFrame(clf_param_rows), width="stretch", hide_index=True)
 
     st.markdown("---")
     st.markdown("### 🖼️ Models Comparison")

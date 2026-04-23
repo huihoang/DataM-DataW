@@ -57,7 +57,6 @@ def summarize_model(path: Path) -> dict[str, Any]:
     record["load_status"] = "ok"
     record["object_type"] = type(model).__name__
     record["module"] = type(model).__module__
-    record["model_repr"] = str(model)
 
     if hasattr(model, "steps"):  # sklearn Pipeline
         steps = getattr(model, "steps", [])
@@ -70,26 +69,22 @@ def summarize_model(path: Path) -> dict[str, Any]:
     if hasattr(model, "n_features_in_"):
         record["n_features_in_"] = int(getattr(model, "n_features_in_"))
 
-    if hasattr(model, "get_params"):
-        params = model.get_params(deep=False)
-        record["params"] = _json_safe(params)
+    deep_params = model.get_params(deep=True) if hasattr(model, "get_params") else {}
 
-    # Quick attribute snapshot for engineering inspection
-    attrs = [a for a in dir(model) if not a.startswith("__")]
-    important = [
-        "steps",
-        "named_steps",
-        "predict",
-        "predict_proba",
-        "transform",
-        "fit",
-        "get_params",
-        "classes_",
-        "n_features_in_",
-    ]
-    underscore_attrs = [a for a in attrs if a.endswith("_")]
-    record["important_attributes"] = [a for a in important if a in attrs]
-    record["learned_attributes_sample"] = sorted(underscore_attrs)[:80]
+    clf_estimator = extract_clf_estimator(model)
+    if clf_estimator is not None:
+        record["clf_class"] = type(clf_estimator).__name__
+        record["clf_module"] = type(clf_estimator).__module__
+        if hasattr(clf_estimator, "get_params"):
+            clf_params = clf_estimator.get_params(deep=True)
+            record["clf_params"] = _json_safe(clf_params)
+            record["clf_params_count"] = len(clf_params)
+        record["clf_capabilities"] = {
+            "has_predict": hasattr(clf_estimator, "predict"),
+            "has_predict_proba": hasattr(clf_estimator, "predict_proba"),
+            "has_feature_importances": hasattr(clf_estimator, "feature_importances_"),
+            "has_coef": hasattr(clf_estimator, "coef_"),
+        }
 
     # Optional training artifacts often useful to engineers
     if hasattr(model, "best_iteration_"):
@@ -101,7 +96,78 @@ def summarize_model(path: Path) -> dict[str, Any]:
     if hasattr(model, "best_loss_"):
         record["best_loss_"] = _json_safe(getattr(model, "best_loss_"))
 
+    # Compact, non-duplicated preprocessing summary from pipeline deep params
+    record["pipeline_param_summary"] = build_pipeline_param_summary(deep_params)
+
     return record
+
+
+def build_pipeline_param_summary(deep_params: dict[str, Any]) -> dict[str, Any]:
+    if not deep_params:
+        return {}
+
+    keys_of_interest = [
+        "model__svd__n_components",
+        "model__svd__random_state",
+        "model__prep__num__imputer__strategy",
+        "model__prep__num__scaler__with_mean",
+        "model__prep__num__scaler__with_std",
+    ]
+    summary = {
+        key: _json_safe(deep_params[key])
+        for key in keys_of_interest
+        if key in deep_params
+    }
+
+    if "model__prep__transformers" in deep_params:
+        transformers = deep_params["model__prep__transformers"]
+        if transformers and len(transformers) > 0 and len(transformers[0]) >= 3:
+            cols = transformers[0][2]
+            summary["num_features"] = len(cols) if isinstance(cols, (list, tuple)) else None
+            summary["feature_columns"] = _json_safe(cols)
+
+    return summary
+
+
+def extract_clf_estimator(model: Any) -> Any | None:
+    """Best-effort extraction of classifier object from sklearn pipelines."""
+    if hasattr(model, "named_steps"):
+        named_steps = getattr(model, "named_steps")
+        if "clf" in named_steps:
+            return named_steps["clf"]
+        if "model" in named_steps:
+            nested = named_steps["model"]
+            if hasattr(nested, "named_steps") and "clf" in nested.named_steps:
+                return nested.named_steps["clf"]
+            return nested
+        if hasattr(model, "steps") and model.steps:
+            return model.steps[-1][1]
+    return model if hasattr(model, "get_params") else None
+
+
+def format_class_signature(estimator: Any) -> str:
+    cls = estimator.__class__
+    try:
+        signature = inspect.signature(cls.__init__)
+    except (TypeError, ValueError):
+        return f"{cls.__name__}(...)"
+
+    rendered_params: list[str] = []
+    for name, param in signature.parameters.items():
+        if name == "self":
+            continue
+        part = name
+        if param.annotation is not inspect._empty:
+            anno = param.annotation
+            anno_text = getattr(anno, "__name__", str(anno))
+            part += f": {anno_text}"
+        if param.default is not inspect._empty:
+            part += f" = {repr(param.default)}"
+        rendered_params.append(part)
+
+    if not rendered_params:
+        return f"{cls.__name__}()"
+    return f"{cls.__name__}(\n  " + ",\n  ".join(rendered_params) + "\n)"
 
 
 def load_with_stubbed_main_classes(path: Path, max_retry: int = 8) -> tuple[Any, list[str]]:
@@ -147,8 +213,8 @@ def load_with_stubbed_main_classes(path: Path, max_retry: int = 8) -> tuple[Any,
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     pkl_by_group = discover_pickles_by_group()
-    all_paths = [path for paths in pkl_by_group.values() for path in paths]
-    model_records = [summarize_model(path) for path in all_paths]
+    trained_model_paths = pkl_by_group["trained_models"]
+    model_records = [summarize_model(path) for path in trained_model_paths]
     pipeline_paths = pkl_by_group["pipeline_artifact"]
     pipeline_records = [summarize_model(path) for path in pipeline_paths]
 
@@ -159,8 +225,9 @@ def main() -> None:
 
     payload = {
         "base_dir": str(BASE_DIR),
-        "num_pickles_found": len(all_paths),
+        "num_pickles_found": len(trained_model_paths),
         "counts_by_group": {k: len(v) for k, v in pkl_by_group.items()},
+        "included_groups": ["trained_models"],
         "pickles": [_json_safe(r) for r in model_records],
         "data_source": "pkl_only",
     }
