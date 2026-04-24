@@ -142,7 +142,7 @@ def render_evaluation_models() -> None:
                 selected_item = next((x for x in pickles if x.get("artifact_name") == selected_artifact), None)
 
                 if selected_item:
-                    st.markdown("#### Table: Core Model Information")
+                    st.markdown("#### Core Model Information")
                     core_explanations = {
                         "clf_class": "Tên thuật toán classifier ở bước cuối pipeline.",
                         "clf_module": "Module Python của classifier (thư viện/namespace).",
@@ -173,7 +173,7 @@ def render_evaluation_models() -> None:
                     ]
                     st.dataframe(pd.DataFrame(core_rows), width="stretch", hide_index=True)
 
-                    st.markdown("#### Table: Classifier Parameters")
+                    st.markdown("#### Classifier Parameters")
                     # Backward compatibility: some old reports used clf_params_non_default.
                     clf_params = selected_item.get("clf_params", selected_item.get("clf_params_non_default", {}))
                     if not isinstance(clf_params, dict):
@@ -205,8 +205,10 @@ def render_evaluation_models() -> None:
         st.info("⚠️ No PNG figures found in model_compare directory.")
         return
 
+    image_paths = sorted(image_paths, key=lambda p: p.name.lower())
+
     threshold_tag = f"threshold_{threshold}"
-    threshold_images = [p for p in image_paths if threshold_tag in p.name]
+    threshold_images = [p for p in image_paths if threshold_tag in p.name.lower()]
     if threshold_images:
         image_paths = threshold_images
     else:
@@ -220,8 +222,19 @@ def render_evaluation_models() -> None:
         else:
             st.info(f"ℹ️ No images matched dataset `{data_set}`, keeping current figure set.")
 
+    # File naming in model_compare:
+    # - confusion_* includes train strategy explicitly (imbalanced OR balanced_smote)
+    # - metrics_bar/pr/roc include both strategies in one figure (imbalanced_balanced)
+    # => apply strategy filter only for confusion files.
     if train_var != "All":
-        strategy_images = [p for p in image_paths if train_var in p.name.lower()]
+        strategy_images = []
+        for p in image_paths:
+            name = p.name.lower()
+            if name.startswith("confusion_"):
+                if f"_{train_var}_" in name:
+                    strategy_images.append(p)
+            else:
+                strategy_images.append(p)
         if strategy_images:
             image_paths = strategy_images
         else:

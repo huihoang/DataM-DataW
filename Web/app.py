@@ -8,6 +8,7 @@ import pandas as pd
 import seaborn as sns
 from pathlib import Path
 import warnings
+import base64
 
 from page_about import render_about
 from page_analysis_ann_model import render_analysis_ann_model
@@ -17,6 +18,10 @@ from page_prediction import render_prediction
 from shared import load_models
 
 warnings.filterwarnings('ignore')
+FOOTER_LOGO_PATH = Path(__file__).resolve().parent / "LogoBK.png"
+FOOTER_LOGO_BASE64 = (
+    base64.b64encode(FOOTER_LOGO_PATH.read_bytes()).decode("utf-8") if FOOTER_LOGO_PATH.exists() else ""
+)
 
 # ============================================================================
 # PAGE CONFIGURATION
@@ -251,14 +256,8 @@ st.markdown("""
     }
     
     /* Footer */
-    .footer {
-        text-align: center;
-        padding: 2rem;
-        color: #999;
-        font-size: 0.9rem;
-        border-top: 1px solid #eee;
-        margin-top: 3rem;
-    }
+    .footer { text-align: center; padding: 2rem; color: #999; }
+    .footer p { font-size: 0.85rem; margin: 4px 0; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -314,9 +313,18 @@ PAGES[page]()
 # FOOTER
 # ============================================================================
 st.markdown("---")
-st.markdown("""
-<div style='text-align: center; padding: 2rem; color: #999;'>
-    <p><strong>🔍 Fraud Detection System</strong> | Advanced ML Analytics</p>
-    <p style='font-size: 0.85rem;'>© 2026 Data Warehouse + Data Mining Course Project</p>
+school_line = "Trường Đại học Bách Khoa ĐHQG-HCM"
+if FOOTER_LOGO_BASE64:
+    school_line = (
+        f"<img src='data:image/png;base64,{FOOTER_LOGO_BASE64}' "
+        "style='height:36px; width:auto; vertical-align:middle; margin-right:6px;'/>"
+        f"{school_line}"
+    )
+
+st.markdown(f"""
+<div class='footer'>
+    <p class='footer-line'>{school_line}</p>
+    <p class='footer-line'><strong>🔍 Fraud Detection System</strong> | Advanced ML Analytics</p>
+    <p class='footer-line'>© 2026 Data Warehouse + Data Mining Course Project | Developed by: Ng.H.Hoàng, Ng.T.Hoàng, Ng.D.Duy</p>
 </div>
 """, unsafe_allow_html=True)

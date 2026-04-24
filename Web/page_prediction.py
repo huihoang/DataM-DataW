@@ -335,7 +335,7 @@ def render_prediction() -> None:
             "merch_lat": 0.0001,
         }
 
-        display_features = [f for f in FEATURE_NAMES if f not in ["amt_log", "amt_x_distance"]]
+        display_features = [f for f in FEATURE_NAMES if f not in ["amt_log", "amt_x_distance", "is_weekend", "distance_km"]]
         col_count = 3
         for i in range(0, len(display_features), col_count):
             cols = st.columns(col_count)
@@ -345,22 +345,27 @@ def render_prediction() -> None:
                     step_v = steps.get(feature, 1.0)
                     help_text = field_descriptions.get(feature, "No description available.")
 
-                    if feature == "is_weekend":
-                        feature_values[feature] = st.radio(
-                            feature, [0, 1], horizontal=True, key=f"pred_{feature}", help=help_text
-                        )
-                    else:
-                        feature_values[feature] = st.slider(
-                            feature,
-                            min_value=float(min_v),
-                            max_value=float(max_v),
-                            value=float(def_v),
-                            step=float(step_v),
-                            key=f"pred_{feature}",
-                            help=help_text,
-                        )
+                    feature_values[feature] = st.slider(
+                        feature,
+                        min_value=float(min_v),
+                        max_value=float(max_v),
+                        value=float(def_v),
+                        step=float(step_v),
+                        key=f"pred_{feature}",
+                        help=help_text,
+                    )
 
         feature_values["amt_log"] = np.log1p(feature_values["amt"])
+        dayofweek_value = int(feature_values.get("dayofweek", 0))
+        feature_values["is_weekend"] = 1 if dayofweek_value >= 5 else 0
+        feature_values["distance_km"] = float(
+            haversine_np(
+                feature_values["lat"],
+                feature_values["long"],
+                feature_values["merch_lat"],
+                feature_values["merch_long"],
+            )
+        )
         feature_values["amt_x_distance"] = feature_values["amt"] * feature_values["distance_km"]
 
         st.markdown("---")
@@ -478,7 +483,7 @@ def render_prediction() -> None:
             pipeline_files if pipeline_files else ["No pipeline found"],
         )
 
-        if st.button("🔍 Predict Fraud", width="stretch"):
+        if st.button("🔍 Predict Batch", width="stretch"):
             if not pipeline_files:
                 st.error("No pipeline .pkl found. Please export one from notebook first.")
                 return
