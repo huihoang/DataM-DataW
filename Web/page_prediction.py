@@ -165,17 +165,11 @@ def register_pipeline_compat_classes() -> None:
 @st.cache_data(show_spinner=False)
 def query_transactions_from_postgres(
     db_url: str,
-    table_name: str,
-    datetime_col: str,
     year: int,
     month: int | None = None,
 ) -> pd.DataFrame:
+    datetime_col = "trans_date_trans_time"
     # Allow only simple identifiers to avoid SQL injection via table/column names.
-    identifier_pattern = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-    if not identifier_pattern.match(table_name):
-        raise ValueError("Invalid table name.")
-    if not identifier_pattern.match(datetime_col):
-        raise ValueError("Invalid datetime column name.")
 
     where_sql = f"""
         EXTRACT(YEAR FROM {datetime_col}::timestamp) = :year
@@ -186,8 +180,31 @@ def query_transactions_from_postgres(
         params["month"] = month
 
     sql = text(f"""
-        SELECT *
-        FROM public.{table_name}
+        SELECT
+            trans_num,
+            trans_date_trans_time,
+            cc_num,
+            merchant,
+            category,
+            amt,
+            first,
+            last,
+            gender,
+            street,
+            city,
+            state,
+            zip,
+            lat,
+            long,
+            city_pop,
+            job,
+            dob,
+            unix_time,
+            merch_lat,
+            merch_long,
+            is_fraud,
+            data_split
+        FROM public.fraud_data
         WHERE {where_sql}
         ORDER BY {datetime_col}::timestamp ASC
     """)
@@ -458,7 +475,7 @@ def render_prediction() -> None:
             with c5:
                 db_name = st.text_input("DB Name", value="fraud_detection_dw", disabled=True)
             with c6:
-                table_name = st.text_input("Table Name", value="fraud_data", disabled=True)
+                st.text_input("Source Table", value="fraud_data", disabled=True)
 
         with st.expander("🗃️ Query", expanded=True):
             c7, c8, c9 = st.columns(3)
@@ -491,8 +508,6 @@ def render_prediction() -> None:
             try:
                 query_df = query_transactions_from_postgres(
                     db_url=db_url,
-                    table_name=table_name,
-                    datetime_col=datetime_col,
                     year=int(q_year),
                     month=int(q_month) if q_month is not None else None,
                 )
