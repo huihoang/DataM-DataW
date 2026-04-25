@@ -11,8 +11,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 from shared import FEATURE_NAMES, load_models
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-PIPELINE_DIR = PROJECT_ROOT / "Source" / "artifacts" / "pipeline_artifact"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PIPELINE_DIR = PROJECT_ROOT / "artifacts" / "pipeline_artifact"
 
 IDENTIFIER_LIKE_COLS = [
     "Unnamed: 0",

@@ -4,8 +4,8 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-MODEL_RESULTS_DIR = PROJECT_ROOT / "Source" / "artifacts" / "modeling_results"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+MODEL_RESULTS_DIR = PROJECT_ROOT / "artifacts" / "modeling_results"
 FIGURES_DIR = MODEL_RESULTS_DIR / "figures"
 METRICS_CSV = MODEL_RESULTS_DIR / "evaluate_ann_model_threshold_0.194.csv"
 
