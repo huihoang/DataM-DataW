@@ -473,7 +473,7 @@ def render_prediction() -> None:
             with c4:
                 db_port = st.number_input("DB Port", min_value=1, max_value=65535, value=5432, step=1)
             with c5:
-                db_name = st.text_input("DB Name", value="fraud_detection_dw", disabled=True)
+                db_name = st.text_input("DB Name", value="fraud_detection_dw")
             with c6:
                 st.text_input("Source Table", value="fraud_data", disabled=True)
 
