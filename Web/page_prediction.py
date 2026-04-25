@@ -463,9 +463,9 @@ def render_prediction() -> None:
         with st.expander("🔗 Configure connection to database", expanded=True):
             c1, c2, c3 = st.columns(3)
             with c1:
-                db_user = st.text_input("DB User", value="root")
+                db_user = st.text_input("DB User")
             with c2:
-                db_password = st.text_input("DB Password", value="root", type="password")
+                db_password = st.text_input("DB Password",  type="password")
             with c3:
                 db_host = st.text_input("DB Host", value="localhost")
 
@@ -473,7 +473,7 @@ def render_prediction() -> None:
             with c4:
                 db_port = st.number_input("DB Port", min_value=1, max_value=65535, value=5432, step=1)
             with c5:
-                db_name = st.text_input("DB Name", value="fraud_detection_dw")
+                db_name = st.text_input("DB Name")
             with c6:
                 st.text_input("Source Table", value="fraud_data", disabled=True)
 
