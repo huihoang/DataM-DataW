@@ -1,0 +1,98 @@
+{
+  "base_dir": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\modeling_results",
+  "artifacts_dir": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts",
+  "pipeline_groups": [
+    "pipeline_artifact"
+  ],
+  "num_pipeline_pickles_found": 1,
+  "pickles": [
+    {
+      "artifact_path": "D:\\Project\\DataMining-DataWarehouse\\Source\\artifacts\\pipeline_artifact\\inference_pipeline.pkl",
+      "artifact_name": "inference_pipeline.pkl",
+      "stubbed_main_classes": [
+        "PreprocessingTransformer",
+        "FeatureSelector",
+        "NumericFillna"
+      ],
+      "load_status": "ok",
+      "object_type": "Pipeline",
+      "module": "sklearn.pipeline",
+      "pipeline_steps": [
+        "feature_engineering",
+        "feature_selector",
+        "fill_missing",
+        "model"
+      ],
+      "final_estimator_type": "Pipeline",
+      "classes_": "[0 1]",
+      "clf_class": "MLPClassifier",
+      "clf_module": "sklearn.neural_network._multilayer_perceptron",
+      "clf_params": {
+        "activation": "relu",
+        "alpha": 0.0001,
+        "batch_size": "auto",
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "early_stopping": true,
+        "epsilon": 1e-08,
+        "hidden_layer_sizes": [
+          64,
+          32
+        ],
+        "learning_rate": "constant",
+        "learning_rate_init": 0.001,
+        "max_fun": 15000,
+        "max_iter": 200,
+        "momentum": 0.9,
+        "n_iter_no_change": 10,
+        "nesterovs_momentum": true,
+        "power_t": 0.5,
+        "random_state": 42,
+        "shuffle": true,
+        "solver": "adam",
+        "tol": 0.0001,
+        "validation_fraction": 0.1,
+        "verbose": false,
+        "warm_start": false
+      },
+      "clf_params_count": 23,
+      "clf_capabilities": {
+        "has_predict": true,
+        "has_predict_proba": true,
+        "has_feature_importances": false,
+        "has_coef": false
+      },
+      "pipeline_param_summary": {
+        "model__svd__n_components": 20,
+        "model__svd__random_state": 42,
+        "model__prep__num__imputer__strategy": "median",
+        "model__prep__num__scaler__with_mean": true,
+        "model__prep__num__scaler__with_std": true,
+        "num_features": 20,
+        "feature_columns": [
+          "amt",
+          "amt_log",
+          "trans_count_hourly",
+          "amt_x_distance",
+          "hour",
+          "merchant_avg_amount",
+          "merchant_fraud_rate",
+          "is_weekend",
+          "merchant_trans_count",
+          "age",
+          "trans_count_daily",
+          "dayofweek",
+          "time_since_last_transaction_min",
+          "month",
+          "city_pop",
+          "lat",
+          "long",
+          "distance_km",
+          "merch_long",
+          "merch_lat"
+        ]
+      }
+    }
+  ],
+  "data_source": "pkl_only"
+}

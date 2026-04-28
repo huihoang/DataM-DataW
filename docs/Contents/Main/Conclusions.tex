@@ -1,0 +1,36 @@
+\newpage
+\section{Conclusion}
+
+\subsection{Achievements}
+
+\begin{itemize}
+    \item \textbf{Fraud Detection Problem:} Among all evaluated models, the \textbf{Decision Tree trained on the imbalanced dataset} achieves the highest recall (0.949285), indicating its strong ability to detect fraudulent transactions.
+
+However, this comes at the cost of very low precision, leading to a large number of false positives. In contrast, the \textbf{Decision Tree trained with SMOTE} provides a more balanced performance, with slightly lower recall (0.931730) but improved stability across evaluation metrics.
+
+Therefore, depending on the application requirements, the imbalanced Decision Tree may be preferred when maximizing recall is the top priority, while the SMOTE-based model offers a more practical trade-off for real-world deployment.
+
+    \item \textbf{Course Learning Outcomes:} This project provides practical experience in applying data mining techniques to a real-world problem. Key concepts such as handling imbalanced data, feature preprocessing, model comparison, and evaluation metrics are effectively applied.
+
+    In particular, the impact of techniques like \textbf{SMOTE} and threshold tuning is clearly observed, highlighting the importance of adapting modeling strategies to the characteristics of the dataset rather than relying solely on default settings.
+\end{itemize}
+
+
+
+\subsection{Challenges and Limitations}
+
+\begin{itemize}
+    \item \textbf{Imbalanced Data:} The extreme class imbalance makes model training difficult, especially for traditional models such as Logistic Regression and Naive Bayes, which struggle to capture minority patterns effectively.
+
+    \item \textbf{Precision-Recall Trade-off:} Improving recall often leads to a significant drop in precision, resulting in a large number of false positives. This creates challenges in balancing model performance for practical deployment.
+
+    \item \textbf{Model Limitations:} Some models (e.g., Naive Bayes) rely on strong assumptions such as feature independence, which do not hold in this dataset. Meanwhile, more complex models like ANN require careful tuning and computational resources.
+
+    \item \textbf{Limited Feature Interpretability:} Due to the use of transformed features (e.g., PCA-like features), it is difficult to interpret the contribution of individual variables to fraud detection.
+
+    \item \textbf{Lack of Real-world Constraints:} The evaluation is conducted on a static dataset, without considering real-time constraints, data drift, or system integration challenges in production environments.
+
+    \item \textbf{Limited Use of Advanced Models:} This project mainly focuses on traditional machine learning models such as Logistic Regression, Decision Tree, Naive Bayes, and ANN. While these models provide a solid baseline, more advanced approaches (e.g., ensemble methods like Random Forest, Gradient Boosting, or deep learning architectures) were not explored.
+
+As a result, the overall performance may not fully reflect the potential of modern fraud detection systems. Incorporating these advanced models could further improve detection capability, especially in handling complex patterns and highly imbalanced data.
+\end{itemize}
