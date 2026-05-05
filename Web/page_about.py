@@ -70,7 +70,7 @@ def render_about() -> None:
     st.markdown(
         """
     <div class="success-box">
-        <strong>✨ Version</strong> 1.1 | April 2026<br>
+        <strong>✨ Version</strong> 1.0 | April 2026<br>
         <strong>📚 Context</strong> Data Mining + Data Warehouse Project<br>
         <strong>🎯 Delivery State</strong> Research Prototype with Business-oriented Evaluation
     </div>
