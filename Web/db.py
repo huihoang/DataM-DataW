@@ -6,9 +6,9 @@ import streamlit as st
 def get_connection():
     return psycopg2.connect(
         host="localhost",
-        database="warehouse",
-        user="postgres",
-        password="2210510"
+        database="fraud_detection_dw",
+        user="dwuser",
+        password="123456"
     )
 
 @st.cache_data
