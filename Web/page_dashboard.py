@@ -282,7 +282,6 @@ def render_dashboard() -> None:
             df_customer["name"] = df_customer["first_name"] + " " + df_customer["last_name"]
             st.bar_chart(df_customer.set_index("name")["fraud_rate_pct"])
     st.markdown("---")
-    st.subheader("📊 Advanced Analytics")
 
     col5, col6 = st.columns(2)
 
@@ -359,8 +358,68 @@ def render_dashboard() -> None:
             import pandas as pd
 
             corr = df_corr.corr(numeric_only=True)
-            st.dataframe(corr)
+            fig_corr = px.imshow(
+                corr,
+                text_auto=".2f",
+                color_continuous_scale="RdBu",
+                zmin=-1,
+                zmax=1,
+                aspect="auto",
+                title="Feature Correlation Heatmap",
+            )
+            fig_corr.update_layout(
+                xaxis_title="Features",
+                yaxis_title="Features",
+                coloraxis_colorbar=dict(title="Corr"),
+            )
+            st.plotly_chart(fig_corr, width="stretch")
 
+    # ============================================================
+    # EXTRA VISUALS (render inline, same style as upper charts)
+    # ============================================================
+    col7, col8 = st.columns(2)
+    with col7:
+        st.subheader("🏪 Merchant Risk Map")
+        if not df_merchant.empty:
+            fig_merch = px.scatter(
+                df_merchant,
+                x="total_transactions",
+                y="fraud_rate_pct",
+                size="fraud_count",
+                color="fraud_amount",
+                hover_name="merchant_name",
+                labels={
+                    "total_transactions": "Total Transactions",
+                    "fraud_rate_pct": "Fraud Rate (%)",
+                    "fraud_amount": "Fraud Amount",
+                },
+            )
+            fig_merch.update_layout(height=420)
+            st.plotly_chart(fig_merch, width="stretch")
+        else:
+            st.warning("No data available for Merchant Risk Map")
+
+    with col8:
+        st.subheader("🌍 Top States by Fraud Rate")
+        if not df_location.empty:
+            df_loc_top = df_location.sort_values("fraud_rate", ascending=False).head(15)
+            fig_loc = px.bar(
+                df_loc_top,
+                x="state",
+                y="fraud_rate",
+                color="fraud_count",
+                text="fraud_rate",
+                labels={
+                    "state": "State",
+                    "fraud_rate": "Fraud Rate (%)",
+                    "fraud_count": "Fraud Count",
+                },
+            )
+            fig_loc.update_traces(texttemplate="%{text:.2f}%", textposition="outside")
+            fig_loc.update_layout(height=420, xaxis_tickangle=-25)
+            st.plotly_chart(fig_loc, width="stretch")
+        else:
+            st.warning("No data available for Top States by Fraud Rate")
 
 
     st.markdown("---")
@@ -393,11 +452,3 @@ def render_dashboard() -> None:
 
     </div>
     """, unsafe_allow_html=True)
-
-    # ============================================================
-    # RAW DATA
-    # ============================================================
-    with st.expander("📋 View Raw Data"):
-        st.dataframe(df_merchant)
-        st.dataframe(df_location)
-        st.dataframe(df_customer)
