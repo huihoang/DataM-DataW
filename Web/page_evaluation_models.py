@@ -101,7 +101,7 @@ def render_evaluation_models() -> None:
             plt.tight_layout()
             st.pyplot(fig)
 
-    with st.expander("🧩 Detailed Parameters", expanded=False):
+    with st.expander("🧩 Detailed Model Information", expanded=False):
         report_path = Path(__file__).resolve().parents[1] / "artifacts" / "modeling_results" / "parameter" / "model_comparison_artifact_report.json"
         report_mtime_ns = report_path.stat().st_mtime_ns if report_path.exists() else 0
         report = load_model_parameter_report(report_mtime_ns)
@@ -142,7 +142,7 @@ def render_evaluation_models() -> None:
                 selected_item = next((x for x in pickles if x.get("artifact_name") == selected_artifact), None)
 
                 if selected_item:
-                    st.markdown("#### Core Model Information")
+                    st.markdown("#### Metadata / Configuration Model")
                     core_explanations = {
                         "clf_class": "Tên thuật toán classifier ở bước cuối pipeline.",
                         "clf_module": "Module Python của classifier (thư viện/namespace).",
@@ -173,7 +173,7 @@ def render_evaluation_models() -> None:
                     ]
                     st.dataframe(pd.DataFrame(core_rows), width="stretch", hide_index=True)
 
-                    st.markdown("#### Classifier Parameters")
+                    st.markdown("#### Hyperparameters")
                     # Backward compatibility: some old reports used clf_params_non_default.
                     clf_params = selected_item.get("clf_params", selected_item.get("clf_params_non_default", {}))
                     if not isinstance(clf_params, dict):
@@ -182,7 +182,7 @@ def render_evaluation_models() -> None:
                     for param_name, param_value in sorted(clf_params.items(), key=lambda x: x[0]):
                         clf_param_rows.append(
                             {
-                                "parameter": str(param_name),
+                                "Hyperparameter": str(param_name),
                                 "value": str(param_value),
                                 # "explanation": "Hyperparameter của classifier đọc từ pkl (get_params deep=True).",
                             }
