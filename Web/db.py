@@ -7,7 +7,7 @@ def get_connection():
     return psycopg2.connect(
         host="localhost",
         database="fraud_detection_dw",
-        user="dwuser",
+        user="whuser",
         password="123456"
     )
 

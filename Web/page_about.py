@@ -5,19 +5,19 @@ def render_about() -> None:
     st.markdown(
         """
     <div class="section-card">
-        <h2>ℹ️ About This Project</h2>
+        <h2><i class="fa-solid fa-circle-info" style="color:#4f46e5;margin-right:8px;"></i>About This Project</h2>
     </div>
     """,
         unsafe_allow_html=True,
     )
 
-    st.markdown("### 🎯 Project Objective")
+    st.markdown("### Project Objective")
     st.write(
         "Xây dựng hệ thống phát hiện gian lận giao dịch theo hướng end-to-end: "
         "từ mô hình hóa, đánh giá nhiều ngưỡng quyết định, đến triển khai dự đoán real-time trên giao diện vận hành."
     )
 
-    st.markdown("### 🧱 Scope and Data")
+    st.markdown("### Scope and Data")
     st.markdown(
         """
     - **Bài toán:** Binary classification (`fraud` vs `normal`) trên dữ liệu mất cân bằng mạnh.
@@ -28,7 +28,7 @@ def render_about() -> None:
     """
     )
 
-    st.markdown("### 🤖 Modeling Strategy")
+    st.markdown("### Modeling Strategy")
     st.markdown(
         """
     - **Mô hình so sánh:** Logistic Regression, Decision Tree, Gaussian Naive Bayes, ANN (MLP).
@@ -37,7 +37,7 @@ def render_about() -> None:
     """
     )
 
-    st.markdown("### 🎚️ Threshold Governance")
+    st.markdown("### Threshold Governance")
     threshold_table = [
         {
             "Threshold": "0.2",
@@ -57,7 +57,7 @@ def render_about() -> None:
     ]
     st.dataframe(threshold_table, width="stretch", hide_index=True)
 
-    st.markdown("### 🏢 Enterprise and Research Readiness")
+    st.markdown("### Enterprise and Research Readiness")
     st.markdown(
         """
     - **Theo hướng doanh nghiệp:** có so sánh đa mô hình, quản trị threshold, và dashboard phục vụ quyết định.
@@ -70,9 +70,9 @@ def render_about() -> None:
     st.markdown(
         """
     <div class="success-box">
-        <strong>✨ Version</strong> 1.0 | April 2026<br>
-        <strong>📚 Context</strong> Data Mining + Data Warehouse Project<br>
-        <strong>🎯 Delivery State</strong> Research Prototype with Business-oriented Evaluation
+        <strong>Version</strong> 1.0 | April 2026<br>
+        <strong>Context</strong> Data Mining + Data Warehouse Project<br>
+        <strong>Delivery State</strong> Research Prototype with Business-oriented Evaluation
     </div>
     """,
         unsafe_allow_html=True,

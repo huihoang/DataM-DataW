@@ -31,33 +31,33 @@ def render_evaluation_models() -> None:
     st.markdown(
         """
     <div class="section-card">
-        <h2>📊 Evaluation Models</h2>
+        <h2><i class="fa-solid fa-chart-column" style="color:#4f46e5;margin-right:8px;"></i>Evaluation Models</h2>
         <p>Trang đánh giá số liệu của các mô hình với các ngưỡng khác nhau và các thống kê metrics.</p>
     </div>
     """,
         unsafe_allow_html=True,
     )
 
-    threshold = st.selectbox("🎚️ Threshold", ["0.2", "0.5", "0.7"], index=0)
+    threshold = st.selectbox("Threshold", ["0.2", "0.5", "0.7"], index=0)
     results_df = load_model_results(threshold=threshold)
     if results_df is None:
-        st.info(f"⚠️ Model results not available for threshold={threshold}.")
+        st.info(f"Model results not available for threshold={threshold}.")
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        data_set = st.selectbox("🗂️ Dataset", ["All", "Validation", "Test"])
+        data_set = st.selectbox("Dataset", ["All", "Validation", "Test"])
     with col2:
-        metric_type = st.selectbox("🔍 Select Metric", ["All", "accuracy", "precision", "recall", "f1", "roc_auc", "pr_auc"])
+        metric_type = st.selectbox("Select Metric", ["All", "accuracy", "precision", "recall", "f1", "roc_auc", "pr_auc"])
     with col3:
-        train_var = st.selectbox("🎯 Training Strategy", ["All", "imbalanced", "balanced_smote"])
+        train_var = st.selectbox("Training Strategy", ["All", "imbalanced", "balanced_smote"])
 
-    with st.expander("📋 Detailed Metrics", expanded=True):
+    with st.expander("Detailed Metrics", expanded=True):
         df_plot = results_df.copy()
         if train_var != "All":
             df_plot = df_plot[df_plot["train_variant"] == train_var]
 
         if df_plot.empty:
-            st.warning("⚠️ No rows after filter.")
+            st.warning("No rows after filter.")
             return
 
         dataset_prefix = {"Validation": "valid_", "Test": "test_"}.get(data_set)
@@ -65,7 +65,7 @@ def render_evaluation_models() -> None:
         col_name = f"{dataset_prefix}{metric_type}" if metric_selected else None
 
         if metric_selected and col_name not in df_plot.columns:
-            st.warning(f"⚠️ Column '{col_name}' not found in results")
+            st.warning(f"Column '{col_name}' not found in results")
             return
 
         st.markdown("### Metrics Table")
@@ -101,14 +101,14 @@ def render_evaluation_models() -> None:
             plt.tight_layout()
             st.pyplot(fig)
 
-    with st.expander("🧩 Detailed Parameters", expanded=False):
+    with st.expander("Detailed Model Information", expanded=False):
         report_path = Path(__file__).resolve().parents[1] / "artifacts" / "modeling_results" / "parameter" / "model_comparison_artifact_report.json"
         report_mtime_ns = report_path.stat().st_mtime_ns if report_path.exists() else 0
         report = load_model_parameter_report(report_mtime_ns)
         pickles = report.get("pickles", []) if isinstance(report, dict) else []
 
         if not pickles:
-            st.info("⚠️ Parameter report not found or empty.")
+            st.info("Parameter report not found or empty.")
         else:
             rows = []
             for item in pickles:
@@ -136,13 +136,13 @@ def render_evaluation_models() -> None:
                 params_df = params_df[params_df["train_variant"] == train_var]
 
             if params_df.empty:
-                st.info(f"ℹ️ No parameter rows for strategy `{train_var}`.")
+                st.info(f"No parameter rows for strategy `{train_var}`.")
             else:
                 selected_artifact = st.selectbox("Select artifact", params_df["artifact_name"].tolist())
                 selected_item = next((x for x in pickles if x.get("artifact_name") == selected_artifact), None)
 
                 if selected_item:
-                    st.markdown("#### Core Model Information")
+                    st.markdown("#### Metadata / Configuration Model")
                     core_explanations = {
                         "clf_class": "Tên thuật toán classifier ở bước cuối pipeline.",
                         "clf_module": "Module Python của classifier (thư viện/namespace).",
@@ -173,7 +173,7 @@ def render_evaluation_models() -> None:
                     ]
                     st.dataframe(pd.DataFrame(core_rows), width="stretch", hide_index=True)
 
-                    st.markdown("#### Classifier Parameters")
+                    st.markdown("#### Hyperparameters")
                     # Backward compatibility: some old reports used clf_params_non_default.
                     clf_params = selected_item.get("clf_params", selected_item.get("clf_params_non_default", {}))
                     if not isinstance(clf_params, dict):
@@ -182,7 +182,7 @@ def render_evaluation_models() -> None:
                     for param_name, param_value in sorted(clf_params.items(), key=lambda x: x[0]):
                         clf_param_rows.append(
                             {
-                                "parameter": str(param_name),
+                                "Hyperparameter": str(param_name),
                                 "value": str(param_value),
                                 # "explanation": "Hyperparameter của classifier đọc từ pkl (get_params deep=True).",
                             }
@@ -193,16 +193,16 @@ def render_evaluation_models() -> None:
                         st.dataframe(pd.DataFrame(clf_param_rows), width="stretch", hide_index=True)
 
     st.markdown("---")
-    st.markdown("### 🖼️ Models Comparison")
+    st.markdown("### Models Comparison")
 
     model_compare_dir = Path(__file__).resolve().parents[1] / "artifacts" / "modeling_results" / "figures" / "model_compare"
     if not model_compare_dir.exists():
-        st.info(f"⚠️ Figure directory not found: `{model_compare_dir}`")
+        st.info(f"Figure directory not found: `{model_compare_dir}`")
         return
 
     image_paths = sorted(model_compare_dir.glob("*.png"))
     if not image_paths:
-        st.info("⚠️ No PNG figures found in model_compare directory.")
+        st.info("No PNG figures found in model_compare directory.")
         return
 
     image_paths = sorted(image_paths, key=lambda p: p.name.lower())
@@ -212,7 +212,7 @@ def render_evaluation_models() -> None:
     if threshold_images:
         image_paths = threshold_images
     else:
-        st.info(f"ℹ️ No images matched `{threshold_tag}`, showing all available figures.")
+        st.info(f"No images matched `{threshold_tag}`, showing all available figures.")
 
     dataset_tag = {"Validation": "valid", "Test": "test"}.get(data_set)
     if dataset_tag is not None:
@@ -220,7 +220,7 @@ def render_evaluation_models() -> None:
         if dataset_images:
             image_paths = dataset_images
         else:
-            st.info(f"ℹ️ No images matched dataset `{data_set}`, keeping current figure set.")
+            st.info(f"No images matched dataset `{data_set}`, keeping current figure set.")
 
     # File naming in model_compare:
     # - confusion_* includes train strategy explicitly (imbalanced OR balanced_smote)
@@ -238,7 +238,7 @@ def render_evaluation_models() -> None:
         if strategy_images:
             image_paths = strategy_images
         else:
-            st.info(f"ℹ️ No images matched strategy `{train_var}`, keeping current figure set.")
+            st.info(f"No images matched strategy `{train_var}`, keeping current figure set.")
 
     grouped: dict[str, list[Path]] = {
         "Metrics Bars": [],

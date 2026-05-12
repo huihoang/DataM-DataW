@@ -55,7 +55,7 @@ def load_ann_metrics() -> pd.DataFrame:
 
 
 def _render_metrics_table(df: pd.DataFrame) -> None:
-    st.markdown("### 📋 Metrics Table")
+    st.markdown("### Metrics Table")
     metrics = ["accuracy", "precision", "recall", "f1", "roc_auc", "pr_auc"]
     row_data: dict[str, list[float | str]] = {"Dataset": ["Validation", "Test"]}
     for metric in metrics:
@@ -129,7 +129,7 @@ def _render_figure_gallery() -> None:
         st.info("Chưa tìm thấy ảnh đánh giá ANN trong thư mục artifacts.")
         return
 
-    st.markdown("### 🖼️ Visualization Analysis ANN")
+    st.markdown("### Visualization Analysis ANN")
     for fig_path in figure_files:
         title, description = FIGURE_DESCRIPTIONS.get(
             fig_path.name, ("ANN chart", "Biểu đồ hỗ trợ đánh giá hiệu năng mô hình ANN.")
@@ -146,7 +146,7 @@ def render_analysis_ann_model() -> None:
     st.markdown(
         """
     <div class="section-card">
-        <h2>📈 Analysis ANN Model</h2>
+        <h2><i class="fa-solid fa-brain" style="color:#4f46e5;margin-right:8px;"></i>Analysis ANN Model</h2>
         <p>Trang phân tích chuyên sâu cho model chính là ANN với metrics, diễn giải và hình trực quan.</p>
     </div>
     """,
@@ -158,7 +158,7 @@ def render_analysis_ann_model() -> None:
         st.error("Không đọc được file đánh giá ANN. Vui lòng kiểm tra đường dẫn artifacts.")
         return
 
-    st.markdown("### 🔎 Overview Configuration")
+    st.markdown("### Overview Configuration")
     info_col1, info_col2 = st.columns(2)
     with info_col1:
         st.write(f"- **Model:** `{metrics_df.iloc[0]['model']}`")
@@ -170,7 +170,7 @@ def render_analysis_ann_model() -> None:
     _render_metrics_table(metrics_df)
     _render_metric_charts(metrics_df)
 
-    st.markdown("### 🧠 Opinion Analysis")
+    st.markdown("### Opinion Analysis")
     st.write(
         "- ROC-AUC và PR-AUC đều cao cho thấy ANN có khả năng phân biệt giao dịch fraud tốt trên dữ liệu mất cân bằng.\n"
         "- Precision/Recall ở mức gần nhau cho thấy mô hình đang cân bằng tương đối giữa việc bắt đúng fraud và hạn chế báo động giả.\n"
