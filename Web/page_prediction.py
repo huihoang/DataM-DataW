@@ -263,11 +263,11 @@ def load_with_stubbed_main_classes(pipeline_path: str, max_retry: int = 8):
 
 
 def render_prediction() -> None:
-    with st.expander("🎯 Single Transaction Prediction", expanded=False):
+    with st.expander("Single Transaction Prediction", expanded=False):
         st.markdown(
             """
         <div class="section-card">
-            <h2>🎯 Single Transaction Prediction</h2>
+            <h2><i class="fa-solid fa-bolt" style="color:#4f46e5;margin-right:8px;"></i>Single Transaction Prediction</h2>
             <p>Enter transaction details to get real-time fraud probability prediction</p>
         </div>
         """,
@@ -277,7 +277,7 @@ def render_prediction() -> None:
         col1, _ = st.columns(2)
 
         with col1:
-            selected_model = st.selectbox("🤖 Select Model", ["All Models"] + (list(models.keys()) if models else ["Demo"]))
+            selected_model = st.selectbox("Select Model", ["All Models"] + (list(models.keys()) if models else ["Demo"]))
         # with col2:
         #     threshold = st.slider(
         #         "📊 Decision Threshold",
@@ -288,7 +288,7 @@ def render_prediction() -> None:
         #     )
         
         st.markdown("---")
-        st.markdown("### 📝 Transaction Features")
+        st.markdown("### Transaction Features")
 
         feature_values = {}
         field_descriptions = {
@@ -386,7 +386,7 @@ def render_prediction() -> None:
         feature_values["amt_x_distance"] = feature_values["amt"] * feature_values["distance_km"]
 
         st.markdown("---")
-        if st.button("🔍 Predict Fraud", width="stretch"):
+        if st.button("Predict Fraud", width="stretch"):
             features_array = [feature_values[f] for f in FEATURE_NAMES]
             df = pd.DataFrame([features_array], columns=FEATURE_NAMES)
 
@@ -411,11 +411,11 @@ def render_prediction() -> None:
                         prob = models[selected_model].predict_proba(df)[0, 1]
                         label = models[selected_model].predict(df)[0]
                     except Exception:
-                        st.toast("Error predicting probability", icon="❌")
+                        st.toast("Error predicting probability")
                         st.error("Error predicting probability. Please another model!")
                         return
                 else:
-                    st.toast("Error loading model", icon="❌")
+                    st.toast("Error loading model")
                     st.error("Check your model folder! There is no model to load.")
                     return
 
@@ -426,7 +426,7 @@ def render_prediction() -> None:
                         st.markdown(
                             """
                         <div class="fraud-alert">
-                            <h3>🚨 FRAUD ALERT</h3>
+                            <h3>FRAUD ALERT</h3>
                             <p>High-risk transaction detected</p>
                         </div>
                         """,
@@ -436,7 +436,7 @@ def render_prediction() -> None:
                         st.markdown(
                             """
                         <div class="safe-alert">
-                            <h3>✅ LEGITIMATE</h3>
+                            <h3>LEGITIMATE</h3>
                             <p>Transaction appears safe</p>
                         </div>
                         """,
@@ -449,18 +449,18 @@ def render_prediction() -> None:
                     st.metric("Normal Probability", f"{normal_prob:.2%}")
 
 
-    with st.expander("🎯 Batch Transaction Prediction", expanded=False):
+    with st.expander("Batch Transaction Prediction", expanded=False):
         st.markdown(
             """
         <div class="section-card">
-            <h2>🎯 Batch Transaction Prediction</h2>
+            <h2><i class="fa-solid fa-database" style="color:#4f46e5;margin-right:8px;"></i>Batch Transaction Prediction</h2>
             <p>Query transaction in Database to get real-time fraud probability prediction</p>
         </div>
         """,
             unsafe_allow_html=True,
         )
 
-        with st.expander("🔗 Configure connection to database", expanded=True):
+        with st.expander("Configure connection to database", expanded=True):
             c1, c2, c3 = st.columns(3)
             with c1:
                 db_user = st.text_input("DB User")
@@ -477,7 +477,7 @@ def render_prediction() -> None:
             with c6:
                 st.text_input("Source Table", value="fraud_data", disabled=True)
 
-        with st.expander("🗃️ Query", expanded=True):
+        with st.expander("Query", expanded=True):
             c7, c8, c9 = st.columns(3)
             with c7:
                 q_year = st.number_input("Year", min_value=2000, max_value=2100, value=2020, step=1)
@@ -500,7 +500,7 @@ def render_prediction() -> None:
             pipeline_files if pipeline_files else ["No pipeline found"],
         )
 
-        if st.button("🔍 Predict Batch", width="stretch"):
+        if st.button("Predict Batch", width="stretch"):
             if not pipeline_files:
                 st.error("No pipeline .pkl found. Please export one from notebook first.")
                 return
@@ -576,13 +576,13 @@ def render_prediction() -> None:
                 chart_title = "Normal vs Fraud predictions by day (month view)"
 
             st.success(f"Predicted {len(result_df):,} rows using `{selected_pipeline}`")
-            st.markdown("#### 📄 Probability list")
+            st.markdown("#### Probability list")
             st.dataframe(
                 result_df[[datetime_col, "pred_prob", "pred_label"]].sort_values("pred_prob", ascending=False).head(500),
                 width="stretch",
             )
 
-            st.markdown("#### 📊 Visualization Predictions")
+            st.markdown("#### Visualization Predictions")
             fig, ax = plt.subplots(figsize=(14, 5))
             x = np.arange(len(grouped.index))
             bar_w = 0.42
