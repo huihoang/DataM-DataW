@@ -17,6 +17,7 @@ Interactive web application for fraud detection using machine learning models tr
 - pip or conda
 
 ### Step 1: Create Virtual Environment (Optional but Recommended)
+
 ```bash
 python -m venv venv
 # Windows
@@ -26,16 +27,40 @@ source venv/bin/activate
 ```
 
 ### Step 2: Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 3: Run the Application
+### Step 3: Configure Database Connection
+
+Open `ETL/ETL.py` and update the database settings:
+
+```python
+DB_TYPE = 'postgresql'
+DB_USER = ''
+DB_PASSWORD = ''
+DB_HOST = 'localhost'
+DB_PORT = 5432
+DB_NAME = ''
+```
+
+### Step 4: Run ETL Pipeline
+
+```bash
+python ETL/ETL.py
+```
+
+The script automatically runs `01_CREATE_WAREHOUSE_SCHEMA.sql` and `03_CREATE_DATA_MARTS.sql`, loads the CSV files into staging, and builds all dimension and fact tables.
+Expected output: `fraud_data ≈ 1.9M rows`, `dim_customer ≈ 1.3M`, `fact_transactions ≈ 1.9M`, fraud rate `≈ 0.17%`.
+
+### Step 5: Run the Application
+
 ```bash
 streamlit run app.py
 ```
 
-The app will open in your default browser at `http://localhost:8501`
+The app opens at `http://localhost:8501`.
 
 ## 📊 Data Requirements
 
